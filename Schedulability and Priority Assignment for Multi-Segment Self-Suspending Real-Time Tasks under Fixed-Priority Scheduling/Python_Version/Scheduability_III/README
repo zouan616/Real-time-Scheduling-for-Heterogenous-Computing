@@ -1,2 +1,4 @@
 The third version of the code. The generator.py generates a random task set, and calc.py reads the task set and calculates the Worst Case Response time.
-Input N(task num), M(num of computation segments), C_max, S_max, and utilization rate in main.py
+Input N(task num), M(num of computation segments), C_max, S_max, and utilization rate in main.py.
+
+NOTE: must create input.txt before the first time, or add a judgement in calc.py.
