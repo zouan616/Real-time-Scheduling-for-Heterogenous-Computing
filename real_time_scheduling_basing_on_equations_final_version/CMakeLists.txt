@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.20)
+project(real_time_scheduling_basing_on_equations_final_version)
+
+set(CMAKE_CXX_STANDARD 14)
+
+add_executable(real_time_scheduling_basing_on_equations_final_version main.cpp)
