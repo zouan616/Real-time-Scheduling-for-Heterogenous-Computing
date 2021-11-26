@@ -49,10 +49,10 @@ import generator
 # print("input utilization rate = ")
 # utilization = float(input())
 N = 5
-m = 3
-c_max = 5
-s_max = 5
-utilization = 0.05
+m = 5
+c_max = 10
+s_max = 10
+utilization = 0.1
 # if os.path.exists("log.txt"):
 #     os.remove("log.txt")
 if os.path.exists("out.txt"):
