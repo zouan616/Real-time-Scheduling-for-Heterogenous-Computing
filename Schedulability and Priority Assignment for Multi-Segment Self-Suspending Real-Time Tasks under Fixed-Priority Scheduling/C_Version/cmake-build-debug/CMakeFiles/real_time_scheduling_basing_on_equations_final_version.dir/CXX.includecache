@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/startingfromsjtu/CLionProjects/real_time_scheduling_basing_on_equations_final_version/main.cpp
+fstream
+-
+iostream
+-
+iomanip
+-
+vector
+-
+unistd.h
+-
+
