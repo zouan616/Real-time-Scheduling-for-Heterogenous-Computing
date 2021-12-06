@@ -1,1 +1,2 @@
-
+With total utilization given, generate utilization for each task.
+Instead of randomly generating suspension segments based on s_max, currently on the value of (T - C)
