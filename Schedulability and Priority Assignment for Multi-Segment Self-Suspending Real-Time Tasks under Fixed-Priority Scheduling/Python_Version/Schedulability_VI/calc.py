@@ -101,6 +101,7 @@ def worst_case_response_time_part(k, j):
 
 # Function: calculate the worst-case response time of multi-segment SSS task k_
 def worst_case_response_time(k_, t):
+    global count
     result = execution_time(k_) + suspension_time(k_)
     if k_ == 0:
         return result
@@ -119,6 +120,9 @@ def worst_case_response_time(k_, t):
                 result_toCmp = suspension_time(k_)
                 for j in range(M[k_]):
                     result_toCmp += worst_case_response_time_part(k_, j)
+                # print("=====================================")
+                # print("Count =", count)
+                # print("Deadline = ", t[k_])
                 # print("Worst case response time = ", result)
                 # print("Worst case response time toCmp = ", result_toCmp)
                 if result > result_toCmp:
@@ -130,7 +134,7 @@ def worst_case_response_time(k_, t):
         else:
             if result >= 50000:
                 break
-            if result >= t[k_]:
+            if result > t[k_]:
                 return -1
             result += 10
     return result
@@ -216,17 +220,29 @@ ins.close()
 #         print("task[", i, "] failed")
 #         break
 # print("=========================================================")
-def swap(task_, row1, row2):
+def swap(task_, row1, row2, t, d):
     # print("Original task:", task_)
+    # global T
     temp = task_[row1]
     task_[row1] = task_[row2]
     task_[row2] = temp
+    t_temp = t[row1]
+    t[row1] = t[row2]
+    t[row2] = t_temp
+    d_temp = d[row1]
+    d[row1] = d[row2]
+    d[row2] = d_temp
     # print("After swapping:", task_)
 
 
-def per(task_, i_, n_):
+def per(task_, i_, n_, t, d):
     global flag_all_passed
+    global count
+    # global T
     if i_ == n_ - 1:
+        if flag_all_passed == 1:
+            return
+        count += 1
         flag = 1
         for i in range(n):
             temp = worst_case_response_time(i, T)
@@ -238,17 +254,18 @@ def per(task_, i_, n_):
                 break
         if flag == 1:
             flag_all_passed = 1
-            return
-            # print("flag_all_passed =", flag_all_passed)
+            print("Count = ", count)
+        return
     for j in range(i_, n):
-        swap(task_, i_, j)
-        per(task_, i_ + 1, n_)
-        swap(task_, i_, j)
+        swap(task_, i_, j, t, d)
+        per(task_, i_ + 1, n_, t, d)
+        swap(task_, i_, j, t, d)
 
 
 # task_cpy = task
 flag_all_passed = 0
-per(task, 0, n)
+count = 0
+per(task, 0, n, T, D)
 # print("Res--------------------------------------------------")
 # print("flag_all_passed =", flag_all_passed)
 print("=====================================================")
@@ -259,5 +276,5 @@ elif flag_all_passed == 1:
 else:
     print("ERROR")
 print("=====================================================")
-# task = task_cpy
-# for loop, 如果有一种case全pass就break
+
+
