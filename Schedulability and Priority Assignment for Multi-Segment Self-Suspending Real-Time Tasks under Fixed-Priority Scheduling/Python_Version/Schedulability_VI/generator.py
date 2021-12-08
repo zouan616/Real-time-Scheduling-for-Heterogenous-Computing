@@ -44,7 +44,12 @@ def gen(n, m, c_max, utilization):
         #     task[i][2 * j] = randint(1, c_max)
         for j in range(m - 1):
             s_max_temp = T[i] - execution_time(task, i, M)
-            task[i][2 * j + 1] = randint(max(int(0.1 * s_max_temp / (m - 1)), 1), int(0.6 * s_max_temp / (m - 1)))
+            lower_bound = max(int(0.01 * s_max_temp / (m - 1)), 1)
+            upper_bound = int(0.1 * s_max_temp / (m - 1))
+            while lower_bound >= upper_bound:
+                lower_bound = max(int(0.01 * s_max_temp / (m - 1)), 1)
+                upper_bound = int(0.1 * s_max_temp / (m - 1))
+            task[i][2 * j + 1] = randint(lower_bound, upper_bound)
     print(task)
     with open("input.txt", "w") as fp:
         fp.write(str(n) + "\n")
