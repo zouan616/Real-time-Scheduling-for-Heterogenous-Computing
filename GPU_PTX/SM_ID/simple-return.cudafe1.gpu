@@ -1,0 +1,413 @@
+typedef char __nv_bool;
+# 2074 "/usr/include/driver_types.h" 3
+struct CUstream_st;
+# 28 "/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h" 3
+struct __locale_struct;
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+enum _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEUt_E {
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE17_S_local_capacityE = 15};
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+enum _ZNSt7__cxx1112basic_stringIwSt11char_traitsIwESaIwEEUt_E {
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+_ZNSt7__cxx1112basic_stringIwSt11char_traitsIwESaIwEE17_S_local_capacityE = 3};
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+enum _ZNSt7__cxx1112basic_stringIDsSt11char_traitsIDsESaIDsEEUt_E {
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+_ZNSt7__cxx1112basic_stringIDsSt11char_traitsIDsESaIDsEE17_S_local_capacityE = 7};
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+enum _ZNSt7__cxx1112basic_stringIDiSt11char_traitsIDiESaIDiEEUt_E {
+# 158 "/usr/include/c++/8/bits/basic_string.h" 3
+_ZNSt7__cxx1112basic_stringIDiSt11char_traitsIDiESaIDiEE17_S_local_capacityE = 3};
+# 277 "/usr/include/c++/8/bits/char_traits.h" 3
+struct _ZSt11char_traitsIcE;
+# 371 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct _ZNSt6locale5facetE;
+# 371 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct __SO__NSt6locale5facetE;
+# 522 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct _ZNSt6locale5_ImplE;
+# 62 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct _ZSt6locale;
+# 57 "/usr/include/c++/8/bits/ios_base.h" 3
+enum _ZSt13_Ios_Fmtflags {
+# 59 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt12_S_boolalpha = 1,
+# 60 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_dec,
+# 61 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt8_S_fixed = 4,
+# 62 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_hex = 8,
+# 63 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt11_S_internal = 16,
+# 64 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt7_S_left = 32,
+# 65 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_oct = 64,
+# 66 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt8_S_right = 128,
+# 67 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt13_S_scientific = 256,
+# 68 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt11_S_showbase = 512,
+# 69 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt12_S_showpoint = 1024,
+# 70 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt10_S_showpos = 2048,
+# 71 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt9_S_skipws = 4096,
+# 72 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt10_S_unitbuf = 8192,
+# 73 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt12_S_uppercase = 16384,
+# 74 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt14_S_adjustfield = 176,
+# 75 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt12_S_basefield = 74,
+# 76 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt13_S_floatfield = 260,
+# 77 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt19_S_ios_fmtflags_end = 65536,
+# 78 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt19_S_ios_fmtflags_max = 2147483647,
+# 79 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt19_S_ios_fmtflags_min = (-2147483647-1)};
+# 111 "/usr/include/c++/8/bits/ios_base.h" 3
+enum _ZSt13_Ios_Openmode {
+# 113 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_app = 1,
+# 114 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_ate,
+# 115 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_bin = 4,
+# 116 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt5_S_in = 8,
+# 117 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_out = 16,
+# 118 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt8_S_trunc = 32,
+# 119 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt19_S_ios_openmode_end = 65536,
+# 120 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt19_S_ios_openmode_max = 2147483647,
+# 121 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt19_S_ios_openmode_min = (-2147483647-1)};
+# 153 "/usr/include/c++/8/bits/ios_base.h" 3
+enum _ZSt12_Ios_Iostate {
+# 155 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt10_S_goodbit,
+# 156 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt9_S_badbit,
+# 157 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt9_S_eofbit,
+# 158 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt10_S_failbit = 4,
+# 159 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt18_S_ios_iostate_end = 65536,
+# 160 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt18_S_ios_iostate_max = 2147483647,
+# 161 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt18_S_ios_iostate_min = (-2147483647-1)};
+# 193 "/usr/include/c++/8/bits/ios_base.h" 3
+enum _ZSt12_Ios_Seekdir {
+# 195 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_beg,
+# 196 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_cur,
+# 197 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt6_S_end,
+# 198 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt18_S_ios_seekdir_end = 65536};
+# 530 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base14_Callback_listE;
+# 569 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base6_WordsE;
+# 581 "/usr/include/c++/8/bits/ios_base.h" 3
+enum _ZNSt8ios_baseUt_E {
+# 581 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZNSt8ios_base18_S_local_word_sizeE = 8};
+# 603 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base4InitE;
+# 228 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZSt8ios_base;
+# 125 "/usr/include/c++/8/iosfwd" 3
+struct _ZSt19istreambuf_iteratorIcSt11char_traitsIcEE;
+# 128 "/usr/include/c++/8/iosfwd" 3
+struct _ZSt19ostreambuf_iteratorIcSt11char_traitsIcEE;
+# 80 "/usr/include/c++/8/iosfwd" 3
+struct _ZSt15basic_streambufIcSt11char_traitsIcEE;
+# 41 "/usr/include/x86_64-linux-gnu/c++/8/bits/ctype_base.h" 3
+struct _ZSt10ctype_base;
+# 681 "/usr/include/c++/8/bits/locale_facets.h" 3
+struct _ZSt5ctypeIcE;
+# 1551 "/usr/include/c++/8/bits/locale_facets.h" 3
+enum _ZNSt10__num_baseUt_E {
+# 1552 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base9_S_ominusE,
+# 1553 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base8_S_oplusE,
+# 1554 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_oxE,
+# 1555 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_oXE,
+# 1556 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base10_S_odigitsE,
+# 1557 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base14_S_odigits_endE = 20,
+# 1558 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base11_S_oudigitsE = 20,
+# 1559 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base15_S_oudigits_endE = 36,
+# 1560 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_oeE = 18,
+# 1561 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_oEE = 34,
+# 1562 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base7_S_oendE = 36};
+# 1577 "/usr/include/c++/8/bits/locale_facets.h" 3
+enum _ZNSt10__num_baseUt0_E {
+# 1578 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base9_S_iminusE,
+# 1579 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base8_S_iplusE,
+# 1580 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_ixE,
+# 1581 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_iXE,
+# 1582 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base8_S_izeroE,
+# 1583 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_ieE = 18,
+# 1584 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base5_S_iEE = 24,
+# 1585 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10__num_base7_S_iendE = 26};
+# 1952 "/usr/include/c++/8/bits/locale_facets.h" 3
+struct _ZSt7num_getIcSt19istreambuf_iteratorIcSt11char_traitsIcEEE;
+# 2293 "/usr/include/c++/8/bits/locale_facets.h" 3
+struct _ZSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE;
+# 77 "/usr/include/c++/8/iosfwd" 3
+struct _ZSt9basic_iosIcSt11char_traitsIcEE;
+# 86 "/usr/include/c++/8/iosfwd" 3
+struct _ZSo;
+# 49 "/usr/include/c++/8/bits/codecvt.h" 3
+enum _ZNSt12codecvt_base6resultE {
+# 51 "/usr/include/c++/8/bits/codecvt.h" 3
+_ZNSt12codecvt_base2okE,
+# 52 "/usr/include/c++/8/bits/codecvt.h" 3
+_ZNSt12codecvt_base7partialE,
+# 53 "/usr/include/c++/8/bits/codecvt.h" 3
+_ZNSt12codecvt_base5errorE,
+# 54 "/usr/include/c++/8/bits/codecvt.h" 3
+_ZNSt12codecvt_base6noconvE};
+# 216 "/usr/lib/gcc/x86_64-linux-gnu/8/include/stddef.h" 3
+typedef unsigned long size_t;
+#include "crt/device_runtime.h"
+# 42 "/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h" 3
+typedef struct __locale_struct *__locale_t;
+# 42 "/usr/include/x86_64-linux-gnu/bits/types.h" 3
+typedef unsigned __uint32_t;
+# 26 "/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h" 3
+typedef __uint32_t uint32_t;
+# 32 "/usr/include/x86_64-linux-gnu/c++/8/bits/atomic_word.h" 3
+typedef int _Atomic_word;
+# 238 "/usr/include/x86_64-linux-gnu/c++/8/bits/c++config.h" 3
+typedef unsigned long _ZSt6size_t;
+# 239 "/usr/include/x86_64-linux-gnu/c++/8/bits/c++config.h" 3
+typedef long _ZSt9ptrdiff_t;
+# 98 "/usr/include/c++/8/bits/postypes.h" 3
+typedef _ZSt9ptrdiff_t _ZSt10streamsize;
+# 141 "/usr/include/c++/8/iosfwd" 3
+typedef struct _ZSo _ZSt7ostream;
+# 62 "/usr/include/x86_64-linux-gnu/c++/8/bits/c++locale.h" 3
+typedef __locale_t _ZSt10__c_locale;
+# 371 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct _ZNSt6locale5facetE { const long *__vptr;
+# 377 "/usr/include/c++/8/bits/locale_classes.h" 3
+_Atomic_word _M_refcount;char __nv_no_debug_dummy_end_padding_0[4];};
+# 371 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct __SO__NSt6locale5facetE { const long *__vptr;
+# 377 "/usr/include/c++/8/bits/locale_classes.h" 3
+_Atomic_word _M_refcount;};
+# 62 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct _ZSt6locale {
+# 309 "/usr/include/c++/8/bits/locale_classes.h" 3
+struct _ZNSt6locale5_ImplE *_M_impl;};
+# 323 "/usr/include/c++/8/bits/ios_base.h" 3
+typedef enum _ZSt13_Ios_Fmtflags _ZNSt8ios_base8fmtflagsE;
+# 398 "/usr/include/c++/8/bits/ios_base.h" 3
+typedef enum _ZSt12_Ios_Iostate _ZNSt8ios_base7iostateE;
+# 461 "/usr/include/c++/8/bits/ios_base.h" 3
+typedef enum _ZSt12_Ios_Seekdir _ZNSt8ios_base7seekdirE;
+# 569 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base6_WordsE {
+# 571 "/usr/include/c++/8/bits/ios_base.h" 3
+void *_M_pword;
+# 572 "/usr/include/c++/8/bits/ios_base.h" 3
+long _M_iword;};
+# 603 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base4InitE {};
+# 228 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZSt8ios_base { const long *__vptr;
+# 522 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt10streamsize _M_precision;
+# 523 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZSt10streamsize _M_width;
+# 524 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZNSt8ios_base8fmtflagsE _M_flags;
+# 525 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZNSt8ios_base7iostateE _M_exception;
+# 526 "/usr/include/c++/8/bits/ios_base.h" 3
+_ZNSt8ios_base7iostateE _M_streambuf_state;
+# 560 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base14_Callback_listE *_M_callbacks;
+# 577 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base6_WordsE _M_word_zero;
+# 582 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base6_WordsE _M_local_word[8];
+# 585 "/usr/include/c++/8/bits/ios_base.h" 3
+int _M_word_size;
+# 586 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZNSt8ios_base6_WordsE *_M_word;
+# 592 "/usr/include/c++/8/bits/ios_base.h" 3
+struct _ZSt6locale _M_ios_locale;};
+# 131 "/usr/include/c++/8/streambuf" 3
+typedef char _ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE;
+# 132 "/usr/include/c++/8/streambuf" 3
+typedef struct _ZSt11char_traitsIcE _ZNSt15basic_streambufIcSt11char_traitsIcEE11traits_typeE;
+# 80 "/usr/include/c++/8/iosfwd" 3
+struct _ZSt15basic_streambufIcSt11char_traitsIcEE { const long *__vptr;
+# 191 "/usr/include/c++/8/streambuf" 3
+_ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE *_M_in_beg;
+# 192 "/usr/include/c++/8/streambuf" 3
+_ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE *_M_in_cur;
+# 193 "/usr/include/c++/8/streambuf" 3
+_ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE *_M_in_end;
+# 194 "/usr/include/c++/8/streambuf" 3
+_ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE *_M_out_beg;
+# 195 "/usr/include/c++/8/streambuf" 3
+_ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE *_M_out_cur;
+# 196 "/usr/include/c++/8/streambuf" 3
+_ZNSt15basic_streambufIcSt11char_traitsIcEE9char_typeE *_M_out_end;
+# 199 "/usr/include/c++/8/streambuf" 3
+struct _ZSt6locale _M_buf_locale;};
+# 44 "/usr/include/x86_64-linux-gnu/c++/8/bits/ctype_base.h" 3
+typedef const int *_ZNSt10ctype_base9__to_typeE;
+# 48 "/usr/include/x86_64-linux-gnu/c++/8/bits/ctype_base.h" 3
+typedef unsigned short _ZNSt10ctype_base4maskE;
+# 41 "/usr/include/x86_64-linux-gnu/c++/8/bits/ctype_base.h" 3
+struct _ZSt10ctype_base {};
+# 686 "/usr/include/c++/8/bits/locale_facets.h" 3
+typedef char _ZNSt5ctypeIcE9char_typeE;
+# 681 "/usr/include/c++/8/bits/locale_facets.h" 3
+struct _ZSt5ctypeIcE {  const long *__b_NSt6locale5facetE___vptr;
+# 377 "/usr/include/c++/8/bits/locale_classes.h" 3
+_Atomic_word __b_NSt6locale5facetE__M_refcount;
+# 690 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZSt10__c_locale _M_c_locale_ctype;
+# 691 "/usr/include/c++/8/bits/locale_facets.h" 3
+__nv_bool _M_del;
+# 692 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10ctype_base9__to_typeE _M_toupper;
+# 693 "/usr/include/c++/8/bits/locale_facets.h" 3
+_ZNSt10ctype_base9__to_typeE _M_tolower;
+# 694 "/usr/include/c++/8/bits/locale_facets.h" 3
+const _ZNSt10ctype_base4maskE *_M_table;
+# 695 "/usr/include/c++/8/bits/locale_facets.h" 3
+char _M_widen_ok;
+# 696 "/usr/include/c++/8/bits/locale_facets.h" 3
+char _M_widen[256];
+# 697 "/usr/include/c++/8/bits/locale_facets.h" 3
+char _M_narrow[256];
+# 698 "/usr/include/c++/8/bits/locale_facets.h" 3
+char _M_narrow_ok;char __nv_no_debug_dummy_end_padding_0[6];};
+# 76 "/usr/include/c++/8/bits/basic_ios.h" 3
+typedef char _ZNSt9basic_iosIcSt11char_traitsIcEE9char_typeE;
+# 87 "/usr/include/c++/8/bits/basic_ios.h" 3
+typedef struct _ZSt5ctypeIcE _ZNSt9basic_iosIcSt11char_traitsIcEE12__ctype_typeE;
+# 89 "/usr/include/c++/8/bits/basic_ios.h" 3
+typedef struct _ZSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE _ZNSt9basic_iosIcSt11char_traitsIcEE14__num_put_typeE;
+# 91 "/usr/include/c++/8/bits/basic_ios.h" 3
+typedef struct _ZSt7num_getIcSt19istreambuf_iteratorIcSt11char_traitsIcEEE _ZNSt9basic_iosIcSt11char_traitsIcEE14__num_get_typeE;
+# 77 "/usr/include/c++/8/iosfwd" 3
+struct _ZSt9basic_iosIcSt11char_traitsIcEE { struct _ZSt8ios_base __b_St8ios_base;
+# 96 "/usr/include/c++/8/bits/basic_ios.h" 3
+struct _ZSo *_M_tie;
+# 97 "/usr/include/c++/8/bits/basic_ios.h" 3
+_ZNSt9basic_iosIcSt11char_traitsIcEE9char_typeE _M_fill;
+# 98 "/usr/include/c++/8/bits/basic_ios.h" 3
+__nv_bool _M_fill_init;
+# 99 "/usr/include/c++/8/bits/basic_ios.h" 3
+struct _ZSt15basic_streambufIcSt11char_traitsIcEE *_M_streambuf;
+# 102 "/usr/include/c++/8/bits/basic_ios.h" 3
+const _ZNSt9basic_iosIcSt11char_traitsIcEE12__ctype_typeE *_M_ctype;
+# 104 "/usr/include/c++/8/bits/basic_ios.h" 3
+const _ZNSt9basic_iosIcSt11char_traitsIcEE14__num_put_typeE *_M_num_put;
+# 106 "/usr/include/c++/8/bits/basic_ios.h" 3
+const _ZNSt9basic_iosIcSt11char_traitsIcEE14__num_get_typeE *_M_num_get;};
+# 62 "/usr/include/c++/8/ostream" 3
+typedef char _ZNSo9char_typeE;
+# 71 "/usr/include/c++/8/ostream" 3
+typedef struct _ZSo _ZNSo14__ostream_typeE;
+# 86 "/usr/include/c++/8/iosfwd" 3
+struct _ZSo { const long *__vptr; struct _ZSt9basic_iosIcSt11char_traitsIcEE __v_St9basic_iosIcSt11char_traitsIcEE;};
+#if !defined(__CUDABE__)
+# 145 "/usr/include/crt/common_functions.h" 3
+ __device_builtin__ ___device__(extern  __no_sc__) int printf(const char *__restrict__, ...);
+#endif
+# 3296 "/usr/include/crt/device_functions.h" 3
+___device__(extern  __no_sc__) unsigned __cudaPushCallConfiguration(struct dim3, struct dim3, size_t, struct CUstream_st *);
+# 22 "simple-return.cu"
+___device__(static  __no_sc__) __inline__ uint32_t _ZN43_INTERNAL_21_simple_return_cpp1_ii_51bf810a8__mysmidEv(void);
+# 31 "simple-return.cu"
+__global__ __var_used__ extern void _Z11computationPfS_S_ii(float *, float *, float *, int, int);
+#include "common_functions.h"
+#if !defined(__CUDABE__)
+#endif
+# 22 "simple-return.cu"
+___device__(static  __no_sc__) __inline__ uint32_t _ZN43_INTERNAL_21_simple_return_cpp1_ii_51bf810a8__mysmidEv(void){
+# 22 "simple-return.cu"
+{
+# 23 "simple-return.cu"
+ uint32_t __cuda_local_var_57093_12_non_const_smid;
+# 24 "simple-return.cu"
+__asm volatile("mov.u32 %0, %%smid;" : "=r" (__cuda_local_var_57093_12_non_const_smid) :);
+# 25 "simple-return.cu"
+return __cuda_local_var_57093_12_non_const_smid;
+# 25 "simple-return.cu"
+}}
+# 31 "simple-return.cu"
+__global__ __var_used__ void _Z11computationPfS_S_ii(
+# 31 "simple-return.cu"
+float *x, 
+# 31 "simple-return.cu"
+float *y, 
+# 31 "simple-return.cu"
+float *z, 
+# 31 "simple-return.cu"
+int SM_num_start, 
+# 31 "simple-return.cu"
+int SM_num_end){
+# 31 "simple-return.cu"
+{
+# 33 "simple-return.cu"
+ int __cuda_local_var_57107_5_non_const_SM_num;
+# 37 "simple-return.cu"
+ int __cuda_local_var_57111_5_non_const_i;
+# 34 "simple-return.cu"
+__cuda_local_var_57107_5_non_const_SM_num = ((int)(_ZN43_INTERNAL_21_simple_return_cpp1_ii_51bf810a8__mysmidEv()));
+# 35 "simple-return.cu"
+printf(((const char *)"SM num: %d \n"), __cuda_local_var_57107_5_non_const_SM_num);
+# 37 "simple-return.cu"
+__cuda_local_var_57111_5_non_const_i = ((int)(threadIdx.x));
+# 39 "simple-return.cu"
+if ((SM_num_start <= __cuda_local_var_57107_5_non_const_SM_num) && (__cuda_local_var_57107_5_non_const_SM_num <= SM_num_end))
+# 40 "simple-return.cu"
+{
+# 41 "simple-return.cu"
+(z[__cuda_local_var_57111_5_non_const_i]) = ((x[__cuda_local_var_57111_5_non_const_i]) + (y[__cuda_local_var_57111_5_non_const_i]));
+# 43 "simple-return.cu"
+} 
+# 45 "simple-return.cu"
+}}
