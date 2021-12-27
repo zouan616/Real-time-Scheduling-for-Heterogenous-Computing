@@ -16,7 +16,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
-#define MAXN 128
+#define MAXN 524288
 
 
 static __device__ __inline__ uint32_t __mysmid(){    
@@ -25,22 +25,20 @@ static __device__ __inline__ uint32_t __mysmid(){
   return smid;}
 
 
-
-
 //global function
 __global__ void computation(float* x, float* y, float* z, int SM_num_start, int SM_num_end){
 
 int SM_num;
 SM_num = __mysmid();
-printf("SM num: %d \n", SM_num);
-
-int i = threadIdx.x;
 
 if((SM_num_start <= SM_num)&&(SM_num <= SM_num_end))
 {    
-z[i] = x[i] + y[i];
-//printf("SM num: %d \n", SM_num);
-}
+    // Get our global thread ID
+    int id = blockIdx.x*blockDim.x+threadIdx.x;
+    // Make sure we do not go out of bounds
+    if (id < MAXN)
+        z[id] = x[id] + y[id];
+    }
 
 }
 
@@ -66,7 +64,16 @@ cudaMalloc( ( void ** ) & d_C, size );
 cudaMemcpy( d_A, h_A, size, cudaMemcpyHostToDevice );
 cudaMemcpy( d_B, h_B, size, cudaMemcpyHostToDevice );
 
-computation <<< 1 , 128 >>> ( d_A, d_B, d_C, 0, 0);
+// Number of threads in each thread block
+int blockSize = 1024;
+ 
+// Number of thread blocks in grid
+int gridSize = (int)ceil((float)MAXN/blockSize);
+ 
+// Execute the kernel
+
+
+computation <<< gridSize , blockSize >>> ( d_A, d_B, d_C, 1, 1);
 
 cudaMemcpy( h_C, d_C, size, cudaMemcpyDeviceToHost );
 
