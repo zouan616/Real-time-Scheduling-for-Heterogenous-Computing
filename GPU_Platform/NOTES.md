@@ -1,3 +1,5 @@
+一个 stream 上的计算按 kernel task 提交的顺序串行执行
+
 <details>
 <summary>debugCall</summary>
 
