@@ -3,6 +3,8 @@
 3. 由之前两条引出的另外一个问题, 如果不同线程之间将``task.CPU_ready``作为线程间通信的渠道, 那是否会因为``mutex``造成没法访问这个信号？
 4. 如果我们需要``pthread_scheduling()``这个线程来调度线程 那么系统自带的scheduler ``SCHED_FIFO``有什么用呢？
 
+1. sudo ./main para-1.txt para-2.txt para-3.txt para-4.txt para-5.txt``
+
 
 ```C++
 
@@ -33,13 +35,13 @@ thread_func()
     CPU_ZERO(&cpuset1);
     CPU_SET(1, &cpuset1);
     pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset1);
+    //lock the mutex
+    pthread_mutex_lock(&lock);
     //wait for the ready condition to come
     while (task.ready == false)
     {
         pthread_cond_wait(&cond, &lock);
     }
-    //lock the mutex
-    pthread_mutex_lock(&lock);
     //execute the computation
     usleep(1000);
     task.done = true;
