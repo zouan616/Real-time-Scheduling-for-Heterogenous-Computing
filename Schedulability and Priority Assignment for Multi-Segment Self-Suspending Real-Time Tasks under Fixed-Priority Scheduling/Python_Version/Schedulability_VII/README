@@ -1,1 +1,2 @@
-
+Algorithm extended to multiple CPU cores, and the generation of tasks is updated.
+Valid "input.txt" file is still required before running.
