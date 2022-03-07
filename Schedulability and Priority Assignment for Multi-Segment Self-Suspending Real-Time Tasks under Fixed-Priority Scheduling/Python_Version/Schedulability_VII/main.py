@@ -49,21 +49,23 @@ import generator
 # print("input utilization rate = ")
 # utilization = float(input())
 N = 5
-m = 5
-c_max = 100
-s_max = 100
+m = 3
+c_max = 10
+s1 = 0.01
+s2 = 0.1
+# s = [0.01, 0.1](T - C)
 num_cpu = 2
-utilization_net = 2
+utilization_net = 1
 # if os.path.exists("log.txt"):
 #     os.remove("log.txt")
 if os.path.exists("out.txt"):
     os.remove("out.txt")
 
 # failed_count = 0
-count = 100
+count = 1000
 for _ in range(count):
     # os.system("generator.py")
-    generator.gen(N, m, c_max, s_max, utilization_net)
+    generator.gen(N, m, c_max, utilization_net, s1, s2)
     # time.sleep(1)
     # os.system("calc.py")
     os.system("calc.py >> out.txt")
