@@ -143,22 +143,30 @@ def worst_case_response_time(k_, t):
 
 
 def worst_case_response_time_2(k_, t, num_cpu):
-    result = 1
+    result = 0
     c_index = 0
     s_index = 0
     temp_counter = 0
     while 1:
+        result += 1
         temp_ = 0
         for i in range(k_):
             temp_ += workload_function(i, result)
+        # print("Workload function net for task", k_, " = ", temp_)
         # print("M * t = ", num_cpu * result)
         # print("Sigma_Workload = ", temp_ + temp_counter)
         # print("-----------------------------------------------------------")
         if num_cpu * result > temp_ + temp_counter:
+            # print("function satisfied, currently result = ", result)
             temp_counter += 1
+            # print("currently temp_counter = ", temp_counter)
+            # print("--------------------------------------------------------")
             if temp_counter >= task[k_][2 * c_index]:
+                # print("temp_counter is larger than computation segment")
+                # print("temp_counter:", temp_counter)
+                # print("computation segment:", task[k_][2 * c_index])
                 temp_counter = 0
-                c_index += 1
+                # print("C_index = ", c_index)
                 if c_index == M[k_] - 1:
                     if result > t[k_]:
                         return -1
@@ -166,11 +174,14 @@ def worst_case_response_time_2(k_, t, num_cpu):
                         return result
                 else:
                     result += task[k_][2 * s_index + 1]
+                    # print("jump the suspension segment, result = ", result)
+                    result -= 1
                     s_index += 1
+                c_index += 1
             if result > t[k_]:
                 return -1
+
         else:
-            result += 1
             if result > t[k_]:
                 return -1
 
@@ -301,16 +312,38 @@ def per(task_, i_, n_, t, d, num_cpu):
 flag_all_passed = 0
 count = 0
 num_cpu = 2
-per(task, 0, n, T, D, num_cpu)
-# print("Res--------------------------------------------------")
-# print("flag_all_passed =", flag_all_passed)
-print("=====================================================")
-if flag_all_passed == 0:
-    print("Failed")
-elif flag_all_passed == 1:
+
+# print(task)
+# print("task[0] = ", worst_case_response_time_2(0, 5, 2))
+# print("task[1] = ", workload_function(1, 10))
+# print("task[2] = ", workload_function(2, 10))
+# print("task[3] = ", workload_function(3, 10))
+# print("task[4] = ", workload_function(4, 10))
+
+flag_ = 1
+for i in range(n):
+    temp = worst_case_response_time_2(i, T, num_cpu)
+    print("Worst case response time for task", i, "= ", temp)
+    print("==========================================================")
+    if temp == -1:
+        flag_ = 0
+        break
+    elif temp > T[i]:
+        flag_ = 0
+        break
+if flag_ == 1:
     print("All tasks passed")
-else:
-    print("ERROR")
-print("=====================================================")
+elif flag_ == 0:
+    print("Failed")
+
+# per(task, 0, n, T, D, num_cpu)
+# print("=====================================================")
+# if flag_all_passed == 0:
+#     print("Failed")
+# elif flag_all_passed == 1:
+#     print("All tasks passed")
+# else:
+#     print("ERROR")
+# print("=====================================================")
 # task = task_cpy
 # for loop, 如果有一种case全pass就break
