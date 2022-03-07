@@ -175,7 +175,6 @@ def worst_case_response_time_2(k_, t, num_cpu):
                 else:
                     result += task[k_][2 * s_index + 1]
                     # print("jump the suspension segment, result = ", result)
-                    result -= 1
                     s_index += 1
                 c_index += 1
             if result > t[k_]:
