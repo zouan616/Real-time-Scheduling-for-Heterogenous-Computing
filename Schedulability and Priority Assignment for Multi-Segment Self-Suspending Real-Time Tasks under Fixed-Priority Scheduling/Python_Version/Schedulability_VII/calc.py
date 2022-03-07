@@ -164,6 +164,7 @@ def worst_case_response_time_2(k_, t, num_cpu):
             temp_counter += 1
             sigma_counter += 1
             # print("currently temp_counter = ", temp_counter)
+            # print("currently sigma_counter = ", sigma_counter)
             # print("--------------------------------------------------------")
             if temp_counter >= task[k_][2 * c_index]:
                 # print("temp_counter is larger than computation segment")
@@ -178,6 +179,7 @@ def worst_case_response_time_2(k_, t, num_cpu):
                         return result
                 else:
                     result += task[k_][2 * s_index + 1]
+                    sigma_counter += num_cpu * task[k_][2 * s_index + 1]
                     # print("jump the suspension segment, result = ", result)
                     # print("--------------------------------------------------------")
                     s_index += 1
