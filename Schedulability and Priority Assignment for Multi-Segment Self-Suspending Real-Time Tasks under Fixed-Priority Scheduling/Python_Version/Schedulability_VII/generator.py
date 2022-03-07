@@ -25,7 +25,7 @@ def execution_time(task, i, M):
     return result
 
 
-def gen(n, m, c_max, s_max, utilization_net):
+def gen(n, m, c_max, utilization_net, s1, s2):
     task = [[0 for _ in range(2 * m - 1)] for _ in range(n)]
     M = [m for _ in range(n)]
     T = [0 for _ in range(n)]
@@ -51,25 +51,25 @@ def gen(n, m, c_max, s_max, utilization_net):
     for i in range(n):
         for j in range(m):
             task[i][2 * j] = randint(1, c_max)
-        for j in range(m - 1):
-            task[i][2 * j + 1] = randint(1, s_max)
+        # for j in range(m - 1):
+        #     task[i][2 * j + 1] = randint(1, s_max)
     # set Period & Deadline
     for i_ in range(n):
-        temp = execution_time(task, i_, M) + suspension_time(task, i_, M)
+        temp = execution_time(task, i_, M)
         T[i_] = int(temp / U[i_])
         D[i_] = T[i_]
     # set suspension segments
-    # for i in range(n):
-    #     # for j in range(m):
-    #     #     task[i][2 * j] = randint(1, c_max)
-    #     for j in range(m - 1):
-    #         s_max_temp = T[i] - execution_time(task, i, M)
-    #         lower_bound = max(int(0.01 * s_max_temp / (m - 1)), 1)
-    #         upper_bound = int(0.1 * s_max_temp / (m - 1))
-    #         while lower_bound >= upper_bound:
-    #             lower_bound = max(int(0.01 * s_max_temp / (m - 1)), 1)
-    #             upper_bound = int(0.1 * s_max_temp / (m - 1))
-    #         task[i][2 * j + 1] = randint(lower_bound, upper_bound)
+    for i in range(n):
+        # for j in range(m):
+        #     task[i][2 * j] = randint(1, c_max)
+        for j in range(m - 1):
+            s_max_temp = T[i] - execution_time(task, i, M)
+            lower_bound = max(int(s1 * s_max_temp / (m - 1)), 1)
+            upper_bound = int(s2 * s_max_temp / (m - 1))
+            while lower_bound >= upper_bound:
+                lower_bound = max(int(s1 * s_max_temp / (m - 1)), 1)
+                upper_bound = max(int(s2 * s_max_temp / (m - 1)), 2)
+            task[i][2 * j + 1] = randint(lower_bound, upper_bound)
     print(task)
     with open("input.txt", "w") as fp:
         fp.write(str(n) + "\n")
