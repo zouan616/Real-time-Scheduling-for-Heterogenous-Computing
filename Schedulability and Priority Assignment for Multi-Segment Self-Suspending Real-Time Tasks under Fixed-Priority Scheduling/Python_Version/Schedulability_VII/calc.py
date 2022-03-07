@@ -147,8 +147,11 @@ def worst_case_response_time_2(k_, t, num_cpu):
     c_index = 0
     s_index = 0
     temp_counter = 0
+    sigma_counter = 0
     while 1:
         result += 1
+        # print("======================================================")
+        # print("Time = ", result)
         temp_ = 0
         for i in range(k_):
             temp_ += workload_function(i, result)
@@ -156,9 +159,10 @@ def worst_case_response_time_2(k_, t, num_cpu):
         # print("M * t = ", num_cpu * result)
         # print("Sigma_Workload = ", temp_ + temp_counter)
         # print("-----------------------------------------------------------")
-        if num_cpu * result > temp_ + temp_counter:
+        if num_cpu * result > temp_ + sigma_counter:
             # print("function satisfied, currently result = ", result)
             temp_counter += 1
+            sigma_counter += 1
             # print("currently temp_counter = ", temp_counter)
             # print("--------------------------------------------------------")
             if temp_counter >= task[k_][2 * c_index]:
@@ -175,6 +179,7 @@ def worst_case_response_time_2(k_, t, num_cpu):
                 else:
                     result += task[k_][2 * s_index + 1]
                     # print("jump the suspension segment, result = ", result)
+                    # print("--------------------------------------------------------")
                     s_index += 1
                 c_index += 1
             if result > t[k_]:
