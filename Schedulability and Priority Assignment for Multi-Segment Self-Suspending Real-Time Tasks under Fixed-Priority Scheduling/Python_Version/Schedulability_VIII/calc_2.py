@@ -266,10 +266,6 @@ else:
             T_g2[i - j] = T[i]
         else:
             j += 1
-print(pos_i, pos_j)
-print(task)
-print(task_g1)
-print(task_g2)
 n_g1 = len(task_g1)
 n_g2 = len(task_g2)
 flag_g1 = 0
