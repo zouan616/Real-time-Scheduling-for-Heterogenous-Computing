@@ -1,0 +1,3 @@
+Support for comparison between the original and improved version, with priority assignment, a new python file added for the original model part.
+By allocating tasks through average utilization, the original model is applied to multi-CPU core cases.
+input.txt still required before test.
