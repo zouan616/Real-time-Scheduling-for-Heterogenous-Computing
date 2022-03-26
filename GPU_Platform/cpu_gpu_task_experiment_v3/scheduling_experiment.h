@@ -1,3 +1,4 @@
+#include <fstream>
 #include <pthread.h>
 #include <sched.h>
 #include <stdio.h>
@@ -16,13 +17,14 @@ using namespace std;
     exit(-1);                                                                                                          \
   };
 
-#define CPU_UNIT_TASK (50000) // parameter to generate a unit cpu task of 1 ms
-#define GPU_UNIT_TASK (28500) // parameter to generate a unit gpu task of 1 ms
+#define CPU_UNIT_TASK (47000) // parameter to generate a unit cpu task of 1 ms
+#define GPU_UNIT_TASK (25000) // parameter to generate a unit gpu task of 1 ms
 
 #define CPU_TASK_NUM (3) // number of cpu tasks in a job
 #define GPU_TASK_NUM (2) // number of gpu tasks in a job
 #define PTHREAD_NUM (5)  // number of pthreads
 
+float utilRates[PTHREAD_NUM];                 // utility rates of each pthread
 float cpuTaskLens[PTHREAD_NUM][CPU_TASK_NUM]; // lengths of cpu tasks: (int) 1 ~ 10 ms
 float gpuTaskLens[PTHREAD_NUM][GPU_TASK_NUM]; // lengths of gpu tasks: ms
 float ddls[PTHREAD_NUM];                      // deadline: ms

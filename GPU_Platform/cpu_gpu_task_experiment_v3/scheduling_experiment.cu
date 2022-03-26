@@ -29,13 +29,13 @@ __global__ void gpuTaskFunc(float *dvcData, float gpuTaskLen) {
   }
 }
 
-void *threadFunc(void *_pidPtr) {
-  int _pid = *(int *)_pidPtr;
-  long ddlusec = ddls[_pid] * 1000; // convert ddl to microsecond, consistent with duration
+void *threadFunc(void *_tidPtr) {
+  int _tid = *(int *)_tidPtr;
+  long ddlusec = ddls[_tid] * 1000; // convert ddl to microsecond, consistent with duration
 
   // set scheduling config
   struct sched_param schedParam;
-  schedParam.sched_priority = prios[_pid];
+  schedParam.sched_priority = prios[_tid];
   pthread_setschedparam(pthread_self(), SCHED_FIFO, &schedParam);
 
   // pin to either core 4 or 5
@@ -54,15 +54,16 @@ void *threadFunc(void *_pidPtr) {
     gettimeofday(&startTime, NULL);
 
     // lock when performing tasks
-    pthread_mutex_lock(&pthrdMuts[_pid]);
-    cpuTaskFunc(cpuTaskLens[_pid][0]);
-    gpuTaskFunc<<<2, 1024, 0, streams[_pid]>>>(deviceData[i], gpuTaskLens[_pid][0]);
-    debugCall(cudaStreamSynchronize(streams[_pid]));
-    cpuTaskFunc(cpuTaskLens[_pid][1]);
-    gpuTaskFunc<<<2, 1024, 0, streams[_pid]>>>(deviceData[i], gpuTaskLens[_pid][1]);
-    debugCall(cudaStreamSynchronize(streams[_pid]));
-    cpuTaskFunc(cpuTaskLens[_pid][2]);
-    pthread_mutex_unlock(&pthrdMuts[_pid]);
+    pthread_mutex_lock(&pthrdMuts[_tid]);
+    cpuTaskFunc(cpuTaskLens[_tid][0]);
+    gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(deviceData[_tid], gpuTaskLens[_tid][0]);
+    debugCall(cudaStreamSynchronize(streams[_tid]));
+    cpuTaskFunc(cpuTaskLens[_tid][1]);
+    gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(deviceData[_tid], gpuTaskLens[_tid][1]);
+    debugCall(cudaStreamSynchronize(streams[_tid]));
+    cpuTaskFunc(cpuTaskLens[_tid][2]);
+    // unlock after finishing tasks
+    pthread_mutex_unlock(&pthrdMuts[_tid]);
 
     gettimeofday(&endTime, NULL);
 
@@ -85,6 +86,32 @@ void *threadFunc(void *_pidPtr) {
   return NULL;
 }
 
+void prioGen(vector<vector<int>> &array, int n) {
+
+  int row = 0;
+  vector<int> c(n, 0);
+  vector<int> A = {90, 92, 94, 96, 98};
+  array[row] = A;
+  ++row;
+  int i = 0;
+  while (i < n) {
+    if (c[i] < i) {
+      if (i / 2 * 2 == i) {
+        swap(A[0], A[i]);
+      } else {
+        swap(A[c[i]], A[i]);
+      }
+      array[row] = A;
+      ++row;
+      ++c[i];
+      i = 0;
+    } else {
+      c[i] = 0;
+      ++i;
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   // init setup
   for (int i = 0; i < PTHREAD_NUM; ++i) {
@@ -97,13 +124,6 @@ int main(int argc, char **argv) {
   // now cudaStreamSynchronize will release cpu
   cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
 
-/* TODO, read in these data
-cpuTaskLens[PTHREAD_NUM][CPU_TASK_NUM]; // lengths of cpu tasks: (int) 1 ~ 10 ms
-gpuTaskLens[PTHREAD_NUM][GPU_TASK_NUM]; // lengths of gpu tasks: ms
-ddls[PTHREAD_NUM];                      // deadline: ms
-prios[PTHREAD_NUM];                       // priority of each thread: 0 ~ 99
-*/
-
   // prepare data
   for (int i = 0; i < PTHREAD_NUM; ++i) {
     hostData[i] = (float *)malloc(2048 * sizeof(float));
@@ -111,6 +131,25 @@ prios[PTHREAD_NUM];                       // priority of each thread: 0 ~ 99
     debugCall(cudaMalloc((void **)&deviceData[i], 2048 * sizeof(float)));
     debugCall(cudaMemcpy(deviceData[i], hostData[i], 2048 * sizeof(float), cudaMemcpyHostToDevice));
   }
+
+  // read in parameters
+  ifstream pthreadData;
+  pthreadData.open("pthreadData.dat");
+  for (int i = 0; i < PTHREAD_NUM; ++i) {
+    pthreadData >> utilRates[i] >> ddls[i] >> cpuTaskLens[i][0] >> cpuTaskLens[i][1] >> cpuTaskLens[i][2] >>
+        gpuTaskLens[i][0] >> gpuTaskLens[i][1];
+  }
+  pthreadData.close();
+
+  // set priorities
+  vector<vector<int>> array(120);
+  prioGen(array, 5);
+  int prioLine = atoi(argv[1]);
+  prios[0] = array[prioLine][0];
+  prios[1] = array[prioLine][1];
+  prios[2] = array[prioLine][2];
+  prios[3] = array[prioLine][3];
+  prios[4] = array[prioLine][4];
 
   // warm up gpu, should be removed in later versions
   float *hd = (float *)malloc(2048 * sizeof(float));
@@ -125,19 +164,29 @@ prios[PTHREAD_NUM];                       // priority of each thread: 0 ~ 99
   debugCall(cudaFree(dd));
   debugCall(cudaDeviceSynchronize());
 
-  int _pids[PTHREAD_NUM];
   // create pthreads
+  int _tids[PTHREAD_NUM];
   for (int i = 0; i < PTHREAD_NUM; ++i) {
-    _pids[i] = i;
-    pthread_create(&pthreads[i], NULL, threadFunc, (void *)&_pids[i]);
+    _tids[i] = i;
+    pthread_create(&pthreads[i], NULL, threadFunc, (void *)&_tids[i]);
   }
   for (int i = 0; i < PTHREAD_NUM; ++i) {
     pthread_join(pthreads[i], NULL);
   }
+
+  // successful scheduling
   // clean memory
   for (int i = 0; i < PTHREAD_NUM; ++i) {
     free(hostData[i]);
     debugCall(cudaFree(deviceData[i]));
+  }
+  // print info
+  for (int i = 0; i < PTHREAD_NUM; ++i) {
+    printf("%f %f ", utilRates[i], ddls[i]);
+    printf("%f %f %f %f ", cpuTaskLens[i][0], cpuTaskLens[i][1], cpuTaskLens[i][2],
+           cpuTaskLens[i][0] + cpuTaskLens[i][1] + cpuTaskLens[i][2]);
+    printf("%f %f %f ", gpuTaskLens[i][0], gpuTaskLens[i][1], gpuTaskLens[i][0] + gpuTaskLens[i][1]);
+    printf("%d ", prios[i]); // notice, no \n, for cooperation with driver.sh
   }
   return 0;
 }
