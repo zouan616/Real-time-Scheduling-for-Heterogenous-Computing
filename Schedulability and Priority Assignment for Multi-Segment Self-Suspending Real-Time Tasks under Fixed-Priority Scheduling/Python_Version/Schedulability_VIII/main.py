@@ -49,19 +49,21 @@ import generator
 # print("input utilization rate = ")
 # utilization = float(input())
 N = 5
-m = 2
+m = 20
 c_max = 10
-s1 = 0.01
-s2 = 0.1
-# s = [0.01, 0.1](T - C)
+s1 = 0.6
+s2 = 1
+# s = [0.1, 0.6](T - C)
 num_cpu = 2
-utilization_net = 1.7
+utilization_net = 0.6
 # if os.path.exists("log.txt"):
 #     os.remove("log.txt")
 if os.path.exists("out.txt"):
     os.remove("out.txt")
 if os.path.exists("out2.txt"):
     os.remove("out2.txt")
+if os.path.exists("out3.txt"):
+    os.remove("out3.txt")
 
 # failed_count = 0
 count = 100
@@ -72,8 +74,8 @@ for _ in range(count):
     # os.system("calc.py")
     os.system("calc.py >> out.txt")
     os.system("calc_2.py >> out2.txt")
-    # test(N, failed_count)
-# print("Passed rate = ", 100 - failed_count * 100 / count, "%")
+    os.system("calc_3.py >> out3.txt")
+
 with open("out.txt", "r") as f:
     passed_count = 0
     line = f.readline()
@@ -93,4 +95,15 @@ with open("out2.txt", "r") as f:
             passed_count += 1
         line = f.readline()
 f.close()
-print("Old mth: Passed rate = ", 100 * passed_count / count, "%")
+print("Stupid old mth: Passed rate = ", 100 * passed_count / count, "%")
+
+
+with open("out3.txt", "r") as f:
+    passed_count = 0
+    line = f.readline()
+    while line:
+        if line[0: 16] == "All tasks passed":
+            passed_count += 1
+        line = f.readline()
+f.close()
+print("XDM: Passed rate = ", 100 * passed_count / count, "%")
