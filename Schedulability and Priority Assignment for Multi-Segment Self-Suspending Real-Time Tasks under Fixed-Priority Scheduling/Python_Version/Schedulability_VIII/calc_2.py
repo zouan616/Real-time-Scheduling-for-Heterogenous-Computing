@@ -1,3 +1,6 @@
+from random import randint
+
+
 def get_Mi_Max(num):
     m_max = M[0]
     for i in range(0, num):
@@ -153,7 +156,7 @@ def worst_case_response_time(task_, k_):
     return result
 
 
-def split(task_, n_):
+def split_5(task_, n_):
     U_sum = 0
     min_val = 2
     global pos_j
@@ -180,11 +183,66 @@ def split(task_, n_):
                 pos_j = j_
 
 
+def split_8(task_, n_):
+    U_sum = 0
+    min_val = 2
+    global pos_1, pos_2, pos_3, pos_4
+    for ui in range(n_):
+        U[ui] = execution_time(task_, ui) / T[ui]
+        U_sum += U[ui]
+    for i_ in range(n_):
+        left_sum = U[i_]
+        right_sum = U_sum - left_sum
+        diff = abs(left_sum - right_sum)
+        if diff < min_val:
+            min_val = diff
+            pos_1 = i_
+            pos_2 = -2
+            pos_3 = -2
+            pos_4 = -2
+    for i_ in range(n_):
+        for j_ in range(i_ + 1, n_):
+            left_sum = U[i_] + U[j_]
+            right_sum = U_sum - left_sum
+            diff = abs(left_sum - right_sum)
+            if diff < min_val:
+                min_val = diff
+                pos_1 = i_
+                pos_2 = j_
+                pos_3 = -2
+                pos_4 = -2
+    for i_ in range(n_):
+        for j_ in range(i_ + 1, n_):
+            for m_ in range(j_ + 1, n_):
+                left_sum = U[i_] + U[j_] + U[m_]
+                right_sum = U_sum - left_sum
+                diff = abs(left_sum - right_sum)
+                if diff < min_val:
+                    min_val = diff
+                    pos_1 = i_
+                    pos_2 = j_
+                    pos_3 = m_
+                    pos_4 = -2
+    for i_ in range(n_):
+        for j_ in range(i_ + 1, n_):
+            for m_ in range(j_ + 1, n_):
+                for k_ in range(m_ + 1, n_):
+                    left_sum = U[i_] + U[j_] + U[m_] + U[k_]
+                    right_sum = U_sum - left_sum
+                    diff = abs(left_sum - right_sum)
+                    if diff < min_val:
+                        min_val = diff
+                        pos_1 = i_
+                        pos_2 = j_
+                        pos_3 = m_
+                        pos_4 = k_
+
 # Function: initialize the tasks
 # n for task number
 # M[i] records number of computation segments of task[i]
 # T[i] and D[i] records the period and relative deadline of task[i]
 # each line of task[][] is characterized in: (C0, S0, C1, S1, ..., S(M-2), C(M-1))
+
 
 line_count = 0
 n = 0
@@ -226,50 +284,197 @@ count = 0
 num_cpu = 2
 pos_i = -2
 pos_j = -2
-split(task, n)
-if pos_j == -1:
-    task_g1 = task[0: 1]
-    task_g1[0] = task[pos_i]
-    task_g2 = task[0: 4]
-    M_g1 = M[0: 1]
-    M_g1[0] = M[pos_i]
-    M_g2 = M[0: 4]
-    T_g1 = T[0: 1]
-    T_g1[0] = T[pos_i]
-    T_g2 = T[0: 4]
-    j = 0
-    for i in range(n):
-        if i != pos_i:
-            task_g2[i - j] = task[i]
-            M_g2[i - j] = M[i]
-            T_g2[i - j] = T[i]
-        else:
-            j += 1
-else:
+# pos_1 = -2
+# pos_2 = -2
+# pos_3 = -2
+# pos_4 = -2
+ran_num = randint(1, 100)
+if ran_num <= 95:
     task_g1 = task[0: 2]
     task_g2 = task[0: 3]
-    task_g1[0] = task[pos_i]
-    task_g1[1] = task[pos_j]
+    task_g1[0] = task[0]
+    task_g1[1] = task[1]
+    task_g2[0] = task[2]
+    task_g2[1] = task[3]
+    task_g2[2] = task[4]
     M_g1 = M[0: 2]
-    M_g1[0] = M[pos_i]
-    M_g1[1] = M[pos_j]
+    M_g1[0] = M[0]
+    M_g1[1] = M[1]
     M_g2 = M[0: 3]
+    M_g2[0] = M[2]
+    M_g2[1] = M[3]
+    M_g2[2] = M[4]
     T_g1 = T[0: 2]
-    T_g1[0] = T[pos_i]
-    T_g1[1] = T[pos_j]
+    T_g1[0] = T[0]
+    T_g1[1] = T[1]
     T_g2 = T[0: 3]
-    j = 0
-    for i in range(n):
-        if (i != pos_i) & (i != pos_j):
-            task_g2[i - j] = task[i]
-            M_g2[i - j] = M[i]
-            T_g2[i - j] = T[i]
-        else:
-            j += 1
+    T_g2[0] = T[2]
+    T_g2[1] = T[3]
+    T_g2[2] = T[4]
+else:
+    task_g1 = task[0: 1]
+    task_g2 = task[0: 4]
+    task_g1[0] = task[0]
+    task_g2[0] = task[1]
+    task_g2[1] = task[2]
+    task_g2[2] = task[3]
+    task_g2[3] = task[4]
+    M_g1 = M[0: 1]
+    M_g1[0] = M[0]
+    M_g2 = M[0: 4]
+    M_g2[0] = M[1]
+    M_g2[1] = M[2]
+    M_g2[2] = M[3]
+    M_g2[3] = M[4]
+    T_g1 = T[0: 1]
+    T_g1[0] = T[0]
+    T_g2 = T[0: 4]
+    T_g2[0] = T[1]
+    T_g2[1] = T[2]
+    T_g2[2] = T[3]
+    T_g2[3] = T[4]
+
+# ====================================================================================================================
+# ===============================八个task分配到两个cpu core============================================================
+# split_8(task, n)
+# if (pos_2 == -2) & (pos_3 == -2) & (pos_4 == -2):
+#     print("1/7")
+#     task_g1 = task[0: 1]
+#     task_g1[0] = task[pos_1]
+#     task_g2 = task[0: 7]
+#     M_g1 = M[0: 1]
+#     M_g1[0] = M[pos_1]
+#     M_g2 = M[0: 7]
+#     T_g1 = T[0: 1]
+#     T_g1[0] = T[pos_1]
+#     T_g2 = T[0: 7]
+#     j = 0
+#     for i in range(n):
+#         if i != pos_1:
+#             task_g2[i - j] = task[i]
+#             M_g2[i - j] = M[i]
+#             T_g2[i - j] = T[i]
+#         else:
+#             j += 1
+# elif (pos_2 != -2) & (pos_3 == -2) & (pos_4 == -2):
+#     print("2/6")
+#     task_g1 = task[0: 2]
+#     task_g2 = task[0: 6]
+#     task_g1[0] = task[pos_1]
+#     task_g1[1] = task[pos_2]
+#     M_g1 = M[0: 2]
+#     M_g1[0] = M[pos_1]
+#     M_g1[1] = M[pos_2]
+#     M_g2 = M[0: 6]
+#     T_g1 = T[0: 2]
+#     T_g1[0] = T[pos_1]
+#     T_g1[1] = T[pos_2]
+#     T_g2 = T[0: 6]
+#     j = 0
+#     for i in range(n):
+#         if (i != pos_1) & (i != pos_2):
+#             task_g2[i - j] = task[i]
+#             M_g2[i - j] = M[i]
+#             T_g2[i - j] = T[i]
+#         else:
+#             j += 1
+# elif (pos_2 != -2) & (pos_3 != -2) & (pos_4 == -2):
+#     task_g1 = task[0: 3]
+#     task_g2 = task[0: 5]
+#     task_g1[0] = task[pos_1]
+#     task_g1[1] = task[pos_2]
+#     task_g1[2] = task[pos_3]
+#     M_g1 = M[0: 3]
+#     M_g1[0] = M[pos_1]
+#     M_g1[1] = M[pos_2]
+#     M_g1[2] = M[pos_3]
+#     M_g2 = M[0: 5]
+#     T_g1 = T[0: 3]
+#     T_g1[0] = T[pos_1]
+#     T_g1[1] = T[pos_2]
+#     T_g1[2] = T[pos_3]
+#     T_g2 = T[0: 5]
+#     j = 0
+#     for i in range(n):
+#         if (i != pos_1) & (i != pos_2) & (i != pos_3):
+#             task_g2[i - j] = task[i]
+#             M_g2[i - j] = M[i]
+#             T_g2[i - j] = T[i]
+#         else:
+#             j += 1
+# else:
+#     task_g1 = task[0: 4]
+#     task_g2 = task[0: 4]
+#     task_g1[0] = task[pos_1]
+#     task_g1[1] = task[pos_2]
+#     task_g1[2] = task[pos_3]
+#     task_g1[3] = task[pos_4]
+#     M_g1 = M[0: 4]
+#     M_g1[0] = M[pos_1]
+#     M_g1[1] = M[pos_2]
+#     M_g1[2] = M[pos_3]
+#     M_g1[3] = M[pos_4]
+#     M_g2 = M[0: 4]
+#     T_g1 = T[0: 4]
+#     T_g1[0] = T[pos_1]
+#     T_g1[1] = T[pos_2]
+#     T_g1[2] = T[pos_3]
+#     T_g1[3] = T[pos_4]
+#     T_g2 = T[0: 4]
+#     j = 0
+#     for i in range(n):
+#         if (i != pos_1) & (i != pos_2) & (i != pos_3) & (i != pos_4):
+#             task_g2[i - j] = task[i]
+#             M_g2[i - j] = M[i]
+#             T_g2[i - j] = T[i]
+#         else:
+#             j += 1
+# ====================================================================================================
+# ===============五个task分配到两个cpu core=============================
+# split_5(task, n)
+# if pos_j == -1:
+#     task_g1 = task[0: 1]
+#     task_g1[0] = task[pos_i]
+#     task_g2 = task[0: 4]
+#     M_g1 = M[0: 1]
+#     M_g1[0] = M[pos_i]
+#     M_g2 = M[0: 4]
+#     T_g1 = T[0: 1]
+#     T_g1[0] = T[pos_i]
+#     T_g2 = T[0: 4]
+#     j = 0
+#     for i in range(n):
+#         if i != pos_i:
+#             task_g2[i - j] = task[i]
+#             M_g2[i - j] = M[i]
+#             T_g2[i - j] = T[i]
+#         else:
+#             j += 1
+# else:
+#     task_g1 = task[0: 2]
+#     task_g2 = task[0: 3]
+#     task_g1[0] = task[pos_i]
+#     task_g1[1] = task[pos_j]
+#     M_g1 = M[0: 2]
+#     M_g1[0] = M[pos_i]
+#     M_g1[1] = M[pos_j]
+#     M_g2 = M[0: 3]
+#     T_g1 = T[0: 2]
+#     T_g1[0] = T[pos_i]
+#     T_g1[1] = T[pos_j]
+#     T_g2 = T[0: 3]
+#     j = 0
+#     for i in range(n):
+#         if (i != pos_i) & (i != pos_j):
+#             task_g2[i - j] = task[i]
+#             M_g2[i - j] = M[i]
+#             T_g2[i - j] = T[i]
+#         else:
+#             j += 1
+# ===============================================================================================
 n_g1 = len(task_g1)
 n_g2 = len(task_g2)
-flag_g1 = 0
-flag_g2 = 0
+
 # print("=========================================================")
 # flag_all_passed = 1
 # for i in range(n_g1):
@@ -361,21 +566,15 @@ def per_g2(task_, i_, n_):
         swap_g2(task_, i_, j)
 
 
+flag_g1 = 0
+flag_g2 = 0
 per_g1(task_g1, 0, n_g1)
 per_g2(task_g2, 0, n_g2)
 if flag_g1 == 1 & flag_g2 == 1:
     print("All tasks passed")
 else:
     print("Failed")
-# per(task, 0, n, T, D, num_cpu)
-# print("=====================================================")
-# if flag_all_passed == 0:
-#     print("Failed")
-# elif flag_all_passed == 1:
-#     print("All tasks passed")
-# else:
-#     print("ERROR")
-# print("=====================================================")
+
 
 # task = task_cpy
 # for loop, 如果有一种case全pass就break
