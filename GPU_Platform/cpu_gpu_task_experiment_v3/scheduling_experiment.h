@@ -17,8 +17,8 @@ using namespace std;
     exit(-1);                                                                                                          \
   };
 
-#define CPU_UNIT_TASK (47000) // parameter to generate a unit cpu task of 1 ms
-#define GPU_UNIT_TASK (25000) // parameter to generate a unit gpu task of 1 ms
+#define CPU_UNIT_TASK (112000) // parameter to generate a unit cpu task of 1 ms
+#define GPU_UNIT_TASK (30000)  // parameter to generate a unit gpu task of 1 ms
 
 #define CPU_TASK_NUM (3) // number of cpu tasks in a job
 #define GPU_TASK_NUM (2) // number of gpu tasks in a job

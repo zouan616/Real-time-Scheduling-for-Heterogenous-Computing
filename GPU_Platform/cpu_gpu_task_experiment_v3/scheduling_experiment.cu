@@ -1,19 +1,11 @@
 #include "scheduling_experiment.h"
 
 void cpuTaskFunc(float cpuTaskLen) {
-  float a = 9876.54321, b = 654.321, c = 0;
+  float c = 0;
   long i = cpuTaskLen * CPU_UNIT_TASK;
   for (long j = 0; j < i; ++j) {
-    c += a / b;
-    c -= a / b;
-    c += a / b;
-    c -= a / b;
-    c += a / b;
-    c -= a / b;
-    c += a / b;
-    c -= a / b;
-    c += a / b;
-    c -= a / b;
+    c += 98765.4321 / 654.321;
+    c -= 98765.4321 / 654.321;
   }
 }
 
@@ -22,8 +14,6 @@ __global__ void gpuTaskFunc(float *dvcData, float gpuTaskLen) {
   float a = 9876.54321, b = 654.321;
   long j = gpuTaskLen * GPU_UNIT_TASK;
   for (long k = 0; k < j; ++k) {
-    dvcData[i] += a / b;
-    dvcData[i] -= a / b;
     dvcData[i] += a / b;
     dvcData[i] -= a / b;
   }

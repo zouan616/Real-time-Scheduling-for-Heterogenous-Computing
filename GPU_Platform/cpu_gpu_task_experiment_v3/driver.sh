@@ -14,7 +14,7 @@ for total_util in {10..200..10}
 do
     echo total_util "$total_util" >> trace
     success_count=0
-    for iteration in {1..50}
+    for iteration in {1..75}
     do
         echo iteration "$iteration" >> trace
         ./data_generator "$total_util" "$level"
@@ -38,7 +38,7 @@ for total_util in {10..200..10}
 do
     echo total_util "$total_util" >> trace
     success_count=0
-    for iteration in {1..50}
+    for iteration in {1..75}
     do
         echo iteration "$iteration" >> trace
         ./data_generator "$total_util" "$level"
@@ -53,7 +53,7 @@ do
             fi
         done
     done
-    echo "$success_count" >> result"$level"
+    echo "$success_count" >> result"$level"2
 done
 
 level=3
@@ -62,7 +62,7 @@ for total_util in {10..200..10}
 do
     echo total_util "$total_util" >> trace
     success_count=0
-    for iteration in {1..50}
+    for iteration in {1..75}
     do
         echo iteration "$iteration" >> trace
         ./data_generator "$total_util" "$level"
