@@ -1,13 +1,27 @@
 #include "scheduling_experiment.h"
 
-int level;                    // 1, 2, 3
-float totalUtilRate;          // total utility rate: 0.1, 0.2 ... 2.0
+// USAGE: ./data_generator [total util] [level] [scale]
+
+float totalUtilRate; // total utility rate: 0.1, 0.2 ... 2.0
+
+// level 1: S = rand(0.01, 0.1) * (T - C)
+// level 2: S = rand(0.1, 0.6) * (T - C)
+// level 3: S = rand(0.6, 1) * (T - C)
+int level;
+
+// scale 1: 3 cpu + 2 gpu segments
+// scale 2: 5 cpu + 4 gpu segments
+// scale 3: 10 cpu + 9 gpu segments
+int scale;
 
 void pthreadDataGen(int _tid) {
-  float C = 0, T = 0;
+  // C: sum cpu segments
+  // S: sum gpu segments
+  // T: deadline
+  float C = 0, S = 0, T = 0;
 
   // cpuTaskLens
-  for (int i = 0; i < CPU_TASK_NUM; ++i) {
+  for (int i = 0; i < cpuTaskNum; ++i) {
     C += cpuTaskLens[_tid][i] = rand() % 10 + 1;
   }
 
@@ -17,60 +31,24 @@ void pthreadDataGen(int _tid) {
   // gpuTaskLens
   // for practical reasons, length of one gpu task is at most twice of the other's
   switch (level) {
-  case 1: // S = rand(0.01, 0.1) * (T - C)
-    gpuTaskLens[_tid][0] = (rand() % 91 + 10) / 1000.0 * (T - C);
-    gpuTaskLens[_tid][1] = (rand() % 51 + 50) / 150.0 * gpuTaskLens[_tid][0];
-    gpuTaskLens[_tid][0] -= gpuTaskLens[_tid][1];
+  case 1:
+    S = (rand() % 91 + 10) / 1000.0 * (T - C);
     break;
-  case 2: // S = rand(0.1, 0.6) * (T - C)
-    gpuTaskLens[_tid][0] = (rand() % 101 + 20) / 200.0 * (T - C);
-    gpuTaskLens[_tid][1] = (rand() % 51 + 50) / 150.0 * gpuTaskLens[_tid][0];
-    gpuTaskLens[_tid][0] -= gpuTaskLens[_tid][1];
+  case 2:
+    S = (rand() % 101 + 20) / 200.0 * (T - C);
     break;
-  case 3: // S = rand(0.6, 1) * (T - C)
-    gpuTaskLens[_tid][0] = (rand() % 101 + 150) / 250.0 * (T - C);
-    gpuTaskLens[_tid][1] = (rand() % 51 + 50) / 150.0 * gpuTaskLens[_tid][0];
-    gpuTaskLens[_tid][0] -= gpuTaskLens[_tid][1];
+  case 3:
+    S = (rand() % 101 + 150) / 250.0 * (T - C);
     break;
   default:
     break;
   }
-
-  // printf("util = %f, ddl = %f\n", utilRates[_tid], ddls[_tid]);
-  // printf("c0 = %f, c1 = %f, c2 = %f\n", cpuTaskLens[_tid][0], cpuTaskLens[_tid][1], cpuTaskLens[_tid][2]);
-  // printf("g0 = %f, g1 = %f\n\n", gpuTaskLens[_tid][0], gpuTaskLens[_tid][1]);
-    ofstream pthreadData;
-  pthreadData.open("pthreadData.dat",std::ios_base::app);
-      pthreadData << utilRates[_tid] <<" "<< ddls[_tid] << " "<<cpuTaskLens[_tid][0] <<" "<< cpuTaskLens[_tid][1] <<" "<< cpuTaskLens[_tid][2]
-                << " "<<gpuTaskLens[_tid][0] << " "<<gpuTaskLens[_tid][1] << endl;
-  pthreadData.close();
-
-}
-
-///////////////////////////
-void prioGen(vector<vector<int>> &array, int n) {
-
-  int row = 0;
-  vector<int> c(n, 0);
-  vector<int> A = {90, 92, 94, 96, 98};
-  array[row] = A;
-  ++row;
-  int i = 0;
-  while (i < n) {
-    if (c[i] < i) {
-      if (i / 2 * 2 == i) {
-        swap(A[0], A[i]);
-      } else {
-        swap(A[c[i]], A[i]);
-      }
-      array[row] = A;
-      ++row;
-      ++c[i];
-      i = 0;
-    } else {
-      c[i] = 0;
-      ++i;
-    }
+  float tmp = 0;
+  for (int i = 0; i < gpuTaskNum; ++i) {
+    tmp += gpuTaskLens[_tid][i] = rand() % 101 + 100;
+  }
+  for (int i = 0; i < gpuTaskNum; ++i) {
+    gpuTaskLens[_tid][i] /= tmp / S;
   }
 }
 
@@ -79,20 +57,49 @@ int main(int argc, char **argv) {
   pthreadData.open("pthreadData.dat");
   pthreadData.close();
   srand((unsigned)time(NULL));
+
   totalUtilRate = atoi(argv[1]) / 100.0;
   level = atoi(argv[2]);
+  scale = atoi(argv[3]);
 
+  // cpu/gpu segments
+  switch (scale) {
+  case 1:
+    cpuTaskNum = 3;
+    gpuTaskNum = 2;
+    break;
+  case 2:
+    cpuTaskNum = 5;
+    gpuTaskNum = 4;
+    break;
+  case 3:
+    cpuTaskNum = 10;
+    gpuTaskNum = 9;
+    break;
+  }
+
+  pthreadData.open("pthreadData.dat", std::ios_base::app);
+  pthreadData << cpuTaskNum << " " << gpuTaskNum << " ";
+
+  // util rate
   float sumUtilRate = 0;
-  // printf("level = %d, totalUtilRate = %f\n\n", level, totalUtilRate);
-  for (int i = 0; i < PTHREAD_NUM; ++i) {
+  for (int _tid= 0; _tid < PTHREAD_NUM; ++_tid) {
     // for practical reasons, one utilrate is at most twice of another
-    sumUtilRate += utilRates[i] = rand() % 101 + 100;
+    sumUtilRate += utilRates[_tid] = rand() % 101 + 100;
   }
-  for (int i = 0; i < PTHREAD_NUM; ++i) {
-    utilRates[i] /= sumUtilRate / totalUtilRate;
-    // printf("util %d = %f\n", i, utilRates[i]);
-    pthreadDataGen(i);
+  for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
+    utilRates[_tid] /= sumUtilRate / totalUtilRate;
+    pthreadDataGen(_tid);
+    pthreadData << utilRates[_tid] << " " << ddls[_tid] << " ";
+    for (int i = 0; i < cpuTaskNum; ++i) {
+      pthreadData << cpuTaskLens[_tid][i] << " ";
+    }
+    for (int i = 0; i < gpuTaskNum; ++i) {
+      pthreadData << gpuTaskLens[_tid][i] << " ";
+    }
+  }
 
-  }
+  pthreadData << endl;
+  pthreadData.close();
   return 0;
 }

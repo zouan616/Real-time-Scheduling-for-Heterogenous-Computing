@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 #include <pthread.h>
 #include <sched.h>
 #include <stdio.h>
@@ -17,21 +18,23 @@ using namespace std;
     exit(-1);                                                                                                          \
   };
 
-#define CPU_UNIT_TASK (112000) // parameter to generate a unit cpu task of 1 ms
-#define GPU_UNIT_TASK (30000)  // parameter to generate a unit gpu task of 1 ms
+// worst case is 1.5 times slower than average case
+#define CPU_UNIT_TASK (60000) / (1.2) // parameter to generate a unit cpu task of 1 ms
+#define GPU_UNIT_TASK (46200) / (1.5) // parameter to generate a unit gpu task of 1 ms
 
-#define CPU_TASK_NUM (3) // number of cpu tasks in a job
-#define GPU_TASK_NUM (2) // number of gpu tasks in a job
-#define PTHREAD_NUM (5)  // number of pthreads
+#define MAX_CPU_TASK_NUM (10) // max number of cpu tasks in a job
+#define MAX_GPU_TASK_NUM (10) // max number of gpu tasks in a job
+#define PTHREAD_NUM (5)       // number of pthreads
 
-float utilRates[PTHREAD_NUM];                 // utility rates of each pthread
-float cpuTaskLens[PTHREAD_NUM][CPU_TASK_NUM]; // lengths of cpu tasks: (int) 1 ~ 10 ms
-float gpuTaskLens[PTHREAD_NUM][GPU_TASK_NUM]; // lengths of gpu tasks: ms
-float ddls[PTHREAD_NUM];                      // deadline: ms
-int prios[PTHREAD_NUM];                       // priority of each thread: 0 ~ 99
-float *hostData[PTHREAD_NUM];                 // gpu task data preparation
-float *deviceData[PTHREAD_NUM];               // gpu task data preparation
-pthread_t pthreads[PTHREAD_NUM];
-cudaStream_t streams[PTHREAD_NUM];
-pthread_mutex_t pthrdMuts[PTHREAD_NUM];
-pthread_mutex_t exitMut;
+float utilRates[PTHREAD_NUM];                     // utility rates of each pthread
+float cpuTaskLens[PTHREAD_NUM][MAX_CPU_TASK_NUM]; // lengths of cpu tasks: (int) 1 ~ 10 ms
+float gpuTaskLens[PTHREAD_NUM][MAX_GPU_TASK_NUM]; // lengths of gpu tasks: ms
+float ddls[PTHREAD_NUM];                          // deadline: ms
+int prios[PTHREAD_NUM];                           // priority of each pthread: 0 ~ 99
+float hostData[PTHREAD_NUM * 2048] = {0};         // gpu task data preparation
+__device__ float deviceData[PTHREAD_NUM][2048];   // gpu task data preparation
+int cpuTaskNum;                                   // number of cpu tasks in a job
+int gpuTaskNum;                                   // number of gpu tasks in a job
+pthread_t pthreads[PTHREAD_NUM];                  // pthreads
+cudaStream_t streams[PTHREAD_NUM];                // each pthreads has its own cuda stream
+int timeExceeded = 0;                             // whether there's a job missing its deadline
