@@ -23,7 +23,8 @@ __global__ void gpuTaskFunc(int _tid, float gpuTaskLen) {
 
 void *threadFunc(void *_tidPtr) {
   int _tid = *(int *)_tidPtr;
-  long ddlusec = ddls[_tid] * 1000; // convert ddl to microsecond, consistent with duration
+  // convert ddl to microsecond, consistent with duration
+  long ddlusec = ddls[_tid] * 1000;
 
   // pin to either core 4 or 5
   cpu_set_t cpuSet;
@@ -35,42 +36,54 @@ void *threadFunc(void *_tidPtr) {
   // set scheduling config
   struct sched_param schedParam;
   schedParam.sched_priority = prios[_tid];
-  cout<< "sched"<<pthread_setschedparam(pthread_self(), SCHED_FIFO, &schedParam)<<endl;
+  pthread_setschedparam(pthread_self(), SCHED_FIFO, &schedParam);
 
   struct timeval startTime;
   struct timeval endTime;
   long duration; // microsecond
 
-  // PERFORM TASKS, 100 TIMES
+  // MAIN LOOP
   for (int i = 0; i < 100; ++i) {
-
+    cout<<_tid<<" loop "<< i<<endl;
+    // launch a batch of tasks
     gettimeofday(&startTime, NULL);
     for (int j = 0; j < gpuTaskNum; ++j) {
       cpuTaskFunc(cpuTaskLens[_tid][j]);
-      // gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(_tid, gpuTaskLens[_tid][j]);
-      // debugCall(cudaStreamSynchronize(streams[_tid]));
-      usleep(gpuTaskLens[_tid][j]*1000);
+      gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(_tid, gpuTaskLens[_tid][j]);
+      usleep(gpuTaskLens[_tid][j] * 1000);
+      cudaStreamSynchronize(streams[_tid]);
     }
     cpuTaskFunc(cpuTaskLens[_tid][cpuTaskNum - 1]);
     gettimeofday(&endTime, NULL);
+    cout<<_tid<<" batch finish"<<endl;
 
-    if (timeExceeded)
+    // some other pthreads time exceeded
+    if (timeExceeded) {
+      isDone[_tid] = 1;
+      cout<<_tid<<" done"<<endl;
       return NULL;
-
+    }
+    // current pthread time exceeded
     duration = endTime.tv_sec * 1000000 + endTime.tv_usec - (startTime.tv_sec * 1000000 + startTime.tv_usec);
     if (duration > ddlusec) {
       timeExceeded = 1;
+      isDone[_tid] = 1;
+      cout<<_tid<<" done"<<endl;
       return NULL;
     }
+    // current pthread not time exceeded, sleep until deadline
     usleep(ddlusec - duration);
   }
+  // current pthread successfully schedule
+  isDone[_tid] = 1;
+  cout<<_tid<<" done"<<endl;
   return NULL;
 }
 
 void prioGen(vector<vector<int>> &array, int n) {
   int row = 0;
   vector<int> c(n, 0);
-  vector<int> A = {90, 92, 94, 96, 98};
+  vector<int> A = {95, 96, 97, 98, 99};
   array[row] = A;
   ++row;
   int i = 0;
@@ -100,12 +113,12 @@ int main(int argc, char **argv) {
   srand((unsigned)time(NULL));
   // instead of default busy waiting (polling)
   // now cudaStreamSynchronize will release cpu
-  // cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync); // TODO
+  cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
 
   // prepare device data
   debugCall(cudaMemcpyToSymbol(deviceData, hostData, PTHREAD_NUM * 5 * sizeof(float)));
 
-  // read in parameters
+  // read parameters from pthreadData.dat
   ifstream pthreadData;
   pthreadData.open("pthreadData.dat");
   pthreadData >> cpuTaskNum >> gpuTaskNum;
@@ -142,12 +155,13 @@ int main(int argc, char **argv) {
   }
 
   // warm up gpu, should be removed in later versions
-  // for (int i = 0; i < 250; ++i) {
-  //   for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
-  //     gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(_tid, 1);
-  //   }
-  // }
-  // debugCall(cudaDeviceSynchronize());
+  for (int i = 0; i < 250; ++i) {
+    for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
+      gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(_tid, 1);
+    }
+  }
+  debugCall(cudaDeviceSynchronize());
+  cout<< "warmed"<<endl;
 
   // create pthreads
   int _tids[PTHREAD_NUM];
@@ -155,11 +169,20 @@ int main(int argc, char **argv) {
     _tids[_tid] = _tid;
     pthread_create(&pthreads[_tid], NULL, threadFunc, (void *)&_tids[_tid]);
   }
+
+  // wait until all pthreads are done
+  while (1) {
+    int done = 1;
+    for (int i = 0; i < PTHREAD_NUM; ++i) {
+      done *= isDone[i];
+    }
+    if (done) {
+      break;
+    }
+  }
   for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
     pthread_join(pthreads[_tid], NULL);
   }
   cudaDeviceReset();
-  if (timeExceeded)
-    exit(10);
-  return 0;
+  exit(timeExceeded);
 }

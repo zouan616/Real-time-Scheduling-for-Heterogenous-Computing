@@ -1,22 +1,28 @@
 #include "scheduling_experiment.h"
 
-// USAGE: ./data_generator [total util] [level] [scale]
+// USAGE: ./data_generator [total utility rate] [level] [scale]
 
-float totalUtilRate; // total utility rate: 0.1, 0.2 ... 2.0
+// write generated data into pthreadData.dat
 
+// total utility rate: 0.1, 0.2 ... 2.0
+// when passed in, multiply by 100, e.g. 10, 20 ... 200
+float totalUtilRate;
+
+// level = 1 or 2 or 3
 // level 1: S = rand(0.01, 0.1) * (T - C)
 // level 2: S = rand(0.1, 0.6) * (T - C)
 // level 3: S = rand(0.6, 1) * (T - C)
 int level;
 
-// scale 1: 3 cpu + 2 gpu segments
-// scale 2: 5 cpu + 4 gpu segments
-// scale 3: 10 cpu + 9 gpu segments
+// scale = 1 or 2 or 3
+// scale 1: 3 cpu + 2 gpu tasks in a batch
+// scale 2: 5 cpu + 4 gpu tasks in a batch
+// scale 3: 10 cpu + 9 gpu tasks in a batch
 int scale;
 
 void pthreadDataGen(int _tid) {
-  // C: sum cpu segments
-  // S: sum gpu segments
+  // C: sum cpu tasks
+  // S: sum gpu tasks
   // T: deadline
   float C = 0, S = 0, T = 0;
 
@@ -62,7 +68,7 @@ int main(int argc, char **argv) {
   level = atoi(argv[2]);
   scale = atoi(argv[3]);
 
-  // cpu/gpu segments
+  // cpu/gpu tasks
   switch (scale) {
   case 1:
     cpuTaskNum = 3;
@@ -83,7 +89,7 @@ int main(int argc, char **argv) {
 
   // util rate
   float sumUtilRate = 0;
-  for (int _tid= 0; _tid < PTHREAD_NUM; ++_tid) {
+  for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
     // for practical reasons, one utilrate is at most twice of another
     sumUtilRate += utilRates[_tid] = rand() % 101 + 100;
   }
