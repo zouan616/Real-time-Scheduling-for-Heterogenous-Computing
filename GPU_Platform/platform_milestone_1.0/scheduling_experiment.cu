@@ -113,8 +113,6 @@ int main(int argc, char **argv) {
     cudaStreamCreate(&streams[_tid]);
   }
   srand((unsigned)time(NULL));
-  // cpu sleep when synchronizing
-  cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
 
   // read parameters from pthreadData.dat
   ifstream pthreadData;
@@ -154,7 +152,7 @@ int main(int argc, char **argv) {
 
   // warm up gpu, should be removed in later versions
   for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
-    gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(_tid, 1000);
+    gpuTaskFunc<<<2, 1024, 0, streams[_tid]>>>(_tid, 250);
   }
   cudaDeviceSynchronize();
 
