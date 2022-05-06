@@ -1,1 +1,2 @@
-Generate png file.
+Generate png & eps file.
+png -> eps: --bmeps -c pngfile.png epsfile.eps
