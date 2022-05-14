@@ -1,3 +1,5 @@
+// sudo ./scheduling_experiment [priorityOrder]
+
 #include "scheduling_experiment.h"
 
 void cpuTaskFunc(float cpuTaskLen) {
@@ -23,10 +25,8 @@ __global__ void gpuTaskFunc(int _tid, float gpuTaskLen) {
 
 void *threadFunc(void *_tidPtr) {
   int _tid = *(int *)_tidPtr;
-  // convert ddl to microsecond, consistent with duration
   long ddlusec = ddls[_tid] * 1000;
 
-  // pin to core 6 or 7
   cpu_set_t cpuSet;
   CPU_ZERO(&cpuSet);
   CPU_SET(6, &cpuSet);
@@ -39,18 +39,16 @@ void *threadFunc(void *_tidPtr) {
 
   struct timeval startTime;
   struct timeval endTime;
-  long duration; // microsecond
+  long duration; // us
 
+  // MAIN LOOP
   for (int i = 0; i < 100; ++i) {
-    // launch a batch of tasks
     gettimeofday(&startTime, NULL);
-    for (int j = 0; j < gpuTaskNum; ++j) {
+    for (int j = 0; j < cpuTaskNum - 1; ++j) {
       cpuTaskFunc(cpuTaskLens[_tid][j]);
       gpuTaskFunc<<<2, 1024, 0, cudaStreams[_tid]>>>(_tid, gpuTaskLens[_tid][j]);
       debugCall(pthread_mutex_unlock(&syncStartMut[_tid]));
       debugCall(pthread_mutex_lock(&syncEndMut[_tid]));
-      // usleep(gpuTaskLens[_tid][j] * 1000);
-      // cudaStreamSynchronize(cudaStreams[_tid]);
     }
     cpuTaskFunc(cpuTaskLens[_tid][cpuTaskNum - 1]);
     gettimeofday(&endTime, NULL);
@@ -68,14 +66,13 @@ void *threadFunc(void *_tidPtr) {
     // current pthread not time exceeded, sleep until deadline
     usleep(ddlusec - duration);
   }
-  // current pthread successfully schedule
+  // current pthread successfully scheduled
   return NULL;
 }
 
 void *syncFunc(void *_tidPtr) {
   int _tid = *(int *)_tidPtr;
 
-  // pin to core 1 to 5, respectively
   cpu_set_t cpuSet;
   CPU_ZERO(&cpuSet);
   CPU_SET(1 + _tid, &cpuSet);
@@ -94,7 +91,6 @@ void *syncFunc(void *_tidPtr) {
 }
 
 int main(int argc, char **argv) {
-  // pin to core 0
   cpu_set_t cpuSet;
   CPU_ZERO(&cpuSet);
   CPU_SET(0, &cpuSet);
@@ -114,13 +110,14 @@ int main(int argc, char **argv) {
   // pthreadDataPrint();
   prioGen(atoi(argv[1]));
 
+  // gpu warm up
   for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
     gpuTaskFunc<<<2, 1024, 0, cudaStreams[_tid]>>>(_tid, 250);
   }
   usleep(250000);
   cudaDebugCall(cudaDeviceSynchronize());
 
-  // start scheduling
+  // START SCHEDULING
   int _tids[PTHREAD_NUM];
   for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
     _tids[_tid] = _tid;

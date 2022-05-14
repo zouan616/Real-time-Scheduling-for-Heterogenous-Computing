@@ -9,7 +9,7 @@ ARGS:
   [taskType]:
     0 -> cpu, 1 -> gpu
   [taskLen]:
-    (float) taskLen of a single task, in ms
+    (float) task length of a single task, in ms
   [unitTaskParam]:
     (int) number of loops to make up a 1 ms task
 */
@@ -20,7 +20,7 @@ ARGS:
 #define cudaDebugCall(F)                                                                                               \
   if ((F) != cudaSuccess) {                                                                                            \
     printf("Error at line %d: %s\n", __LINE__, cudaGetErrorString(cudaGetLastError()));                                \
-    exit(-1);                                                                                                          \
+    exit(1);                                                                                                           \
   };
 
 int taskType;
