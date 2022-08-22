@@ -1,17 +1,14 @@
 /*
 USAGE:
-  sudo ./length_test [taskType] [taskLen] [unitTaskParam]
+  sudo ./length_test [taskType] [taskLen] [unitTask]
   ctrl + c to terminate
-  nvprof to inspect gpu task test
+  nvprof to inspect gpu tasks test results
 EFFECT:
-  test the actual time cost of a single task given following constraints
+  test the time cost of CPU/GPU tasks
 ARGS:
-  [taskType]:
-    0 -> cpu, 1 -> gpu
-  [taskLen]:
-    (float) task length of a single task, in ms
-  [unitTaskParam]:
-    (int) number of loops to make up a 1 ms task
+  [taskType]: 0 -> cpu, 1 -> gpu
+  [taskLen]: (float) task length of a single task, in ms
+  [unitTask]: (int) number of iterations to make up a 1 ms task
 */
 
 #include <stdio.h>
@@ -25,8 +22,8 @@ ARGS:
 
 int taskType;
 float taskLen;
-long cpuUnitTask;
-__device__ long gpuUnitTask;
+int cpuUnitTask;
+__device__ int gpuUnitTask;
 __device__ float deviceData[2048];
 
 void cpuTaskFunc(float cpuTaskLen) {
@@ -50,27 +47,12 @@ __global__ void gpuTaskFunc(float gpuTaskLen) {
   }
 }
 
-__global__ void gpuWarmUpFunc(float gpuTaskLen) {
-  long i = threadIdx.x + blockIdx.x * blockDim.x;
-  long j = gpuTaskLen * gpuUnitTask;
-  float a = 9876.54321, b = 543.21;
-  for (long k = 0; k < j; ++k) {
-    deviceData[i] += a / b;
-    deviceData[i] -= a / b;
-  }
-}
-
 int main(int argc, char **argv) {
   taskType = atoi(argv[1]);
   taskLen = atof(argv[2]);
-  if (taskType == 0) {
-    cpuUnitTask = (long)atoi(argv[3]);
-  } else {
-    long tmp = (long)atoi(argv[3]);
-    cudaDebugCall(cudaMemcpyToSymbol(gpuUnitTask, &tmp, sizeof(long)));
-  }
 
   if (taskType == 0) {
+    cpuUnitTask = atoi(argv[3]);
     while (1) {
       struct timeval startTime;
       struct timeval endTime;
@@ -82,12 +64,15 @@ int main(int argc, char **argv) {
       printf("%ld\n", duration);
     }
   } else {
-    gpuWarmUpFunc<<<2, 1024, 0, 0>>>(250);
+    int tmp = atoi(argv[3]);
+    cudaDebugCall(cudaMemcpyToSymbol(gpuUnitTask, &tmp, sizeof(int)));
+    gpuTaskFunc<<<2, 1024, 0, 0>>>(250); // gpu warm up
     cudaDebugCall(cudaDeviceSynchronize());
     while (1) {
       gpuTaskFunc<<<2, 1024, 0, 0>>>(taskLen);
       cudaDebugCall(cudaDeviceSynchronize());
     }
   }
+
   return 0;
 }
