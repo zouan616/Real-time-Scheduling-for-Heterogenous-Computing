@@ -1,9 +1,12 @@
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <pthread.h>
 #include <sched.h>
+#include <set>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/syscall.h>
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
