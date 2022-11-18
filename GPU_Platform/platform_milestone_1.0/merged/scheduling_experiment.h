@@ -25,8 +25,8 @@ using namespace std;
     exit(1);                                                                                                           \
   };
 
-#define CPU_UNIT_TASK (60500) // parameter to generate a unit cpu task of 1 ms, worst case: 60000 / 1.1
-#define GPU_UNIT_TASK (59900) // parameter to generate a unit gpu task of 1 ms, worst case: 46200 / 1.1
+#define CPU_UNIT_TASK (20000) // parameter to generate a unit cpu task of 1 ms, worst case: 21500 /2
+#define GPU_UNIT_TASK (55000) // parameter to generate a unit gpu task of 1 ms, worst case: 33000 / 2
 #define MAX_CPU_TASK_NUM (51) // max number of cpu tasks in a batch
 #define MAX_GPU_TASK_NUM (51) // max number of gpu tasks in a batch
 #define PTHREAD_NUM (5)       // number of pthreads
@@ -171,14 +171,15 @@ void pthreadDataGen_Scaled(float totalUtilRate, int scale) {
     float S = 0; // sum gpu task lengths
     // CPU TASK LENGTHS
     for (int i = 0; i < cpuTaskNum[_tid]; ++i) {
-      C += cpuTaskLens[_tid][i] = rand() % 10 + 1;
+      C += cpuTaskLens[_tid][i] = rand() % 50 + 1;
     }
     // GPU TASK LENGTHS
     for (int i = 0; i < gpuTaskNum[_tid]; ++i) {
-      S += gpuTaskLens[_tid][i] = rand() % 10 + 1;
+      S += gpuTaskLens[_tid][i] = rand() % 100 + 101;
     }
     // DDL
-    ddls[_tid] = (C + S) / utilRates[_tid];
+    //ddls[_tid] = (C + S) / utilRates[_tid];
+    ddls[_tid] = C / utilRates[_tid];
   }
 }
 
@@ -317,7 +318,12 @@ void pthreadDataPrint() {
 }
 
 void prioGen(int nth) {
-  vector<vector<int>> prioAllPermu(120);
+  prios[0] = 95;
+  prios[1] = 96;
+  prios[2] = 97;
+  prios[3] = 98;
+  prios[4] = 99;
+  /*vector<vector<int>> prioAllPermu(120);
   vector<int> C(PTHREAD_NUM, 0);
   vector<int> A = {95, 96, 97, 98, 99};
   int i = 0;
@@ -341,5 +347,5 @@ void prioGen(int nth) {
   }
   for (int _tid = 0; _tid < PTHREAD_NUM; ++_tid) {
     prios[_tid] = prioAllPermu[nth][_tid];
-  }
+  }*/
 }
