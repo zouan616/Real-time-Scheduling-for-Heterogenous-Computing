@@ -46,7 +46,7 @@ __global__ void gpuTaskFunc(float gpuTaskLen, int gpuUnitTask) {
   }
 }
 
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
   taskType = atoi(argv[1]);
   taskLen = atof(argv[2]);
   unitTask = atoi(argv[3]);
@@ -72,4 +72,37 @@ int main(int argc, char **argv) {
   }
 
   return 0;
-}
+}*/
+
+int main(int argc, char **argv) {
+  taskType = atoi(argv[1]);
+  taskLen = atof(argv[2]);
+  unitTask = atoi(argv[3]);
+  long total_dur = 0.0;
+
+  if (taskType == 0) {
+    for (int i = 0; i < 100; i++){
+      struct timeval startTime;
+      struct timeval endTime;
+      long duration;
+      gettimeofday(&startTime, NULL);
+      cpuTaskFunc(taskLen);
+      gettimeofday(&endTime, NULL);
+      duration = endTime.tv_sec * 1000000 + endTime.tv_usec - (startTime.tv_sec * 1000000 + startTime.tv_usec);
+      total_dur += duration;
+      //printf("%ld\n", duration);
+    }
+  } else {
+    gpuTaskFunc<<<1, 2048, 0, 0>>>(250, unitTask); // gpu warm up
+    cudaDebugCall(cudaDeviceSynchronize());
+    struct timeval startTime;
+    struct timeval endTime;
+    gettimeofday(&startTime, NULL); 
+    for(int i = 0; i < 100; i++){
+      gpuTaskFunc<<<2, 1024, 0, 0>>>(taskLen, unitTask);
+      cudaDebugCall(cudaDeviceSynchronize());
+    }
+    gettimeofday(&endTime, NULL);
+    total_dur = endTime.tv_sec * 1000000 + endTime.tv_usec - (startTime.tv_sec * 1000000 + startTime.tv_usec);
+  }
+  printf("%ld\n", total_dur);
