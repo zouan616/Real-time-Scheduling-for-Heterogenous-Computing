@@ -1,0 +1,41 @@
+Author: Xuankai Xu
+
+
+
+## Scheduling:
+
+Generate tasks with real CPU and GPU workload, and check whether the task set is schedulable.
+
+#### Run:
+
+$ sudo bash driver.sh
+
+---
+
+#### Driver.sh
+
+function daemon(): kill, if not responding for 3000s
+function do_test(): main func
+**line 46-47**: `/usr/local/cuda-11.4/bin/nvcc` need to be modified
+
+---
+
+#### data_generator.cu
+
+Task generation. Task type decided by user input
+
+---
+
+#### scheduling_experiment.h
+
+Include three types of task generation: pthreadDataGen_Benchmark(), pthreadDataGen_Scaled(), pthreadDataGen_Scaled_GLenLeveled(). [not important]
+Func cudaDebugCall() & debugCall(): used to handle error msg. [not necessary]
+
+---
+
+#### scheduling_experiment.cu
+
+cpuTaskFunc(): generate cpu workload
+gpuTaskFunc(): generate gpu workload
+threadFunc(): Each task is allocated to one certain thread. Call `cpuTaskFunc` and `gpuTaskFunc` in each thread, and judge whether it's timeExceeded.
+syncFunc(): cudaStream synchronize.
