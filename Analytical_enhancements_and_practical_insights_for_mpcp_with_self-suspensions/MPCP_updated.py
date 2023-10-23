@@ -141,7 +141,7 @@ def H_(
     :return: WCRT of k-th critical section of task \tau_l
     """
 
-    temp = int(0.1 * execution_time_part(task_, _l, k)) + suspension_time_part(task_, _l, k)
+    temp = int(critical_proportion * execution_time_part(task_, _l, k)) + suspension_time_part(task_, _l, k)
     temp += indirect_blocking_time(_l, R_, zeta_, max_critSection_)
     return temp
 
@@ -263,7 +263,7 @@ def direct_blocking_time_job(
     """
 
     max_H_lp = 0
-    eta_i = max(int(0.1 * (M[i] - 1)), 1)
+    eta_i = max(int(critical_proportion * (M[i] - 1)), 1)
     for _l in range(i + 1, n):
         if R[_l] == R[i]:
             for k in range(M_[_l] - 1):
@@ -323,14 +323,14 @@ def direct_blocking_time_hybrid_hp(
     :param M_: CPU segment number
     :return: direct block time of higher priority tasks on same CPU, under hybrid approach
     """
-    result = int(0.9 * execution_time(task_, i, M)) + suspension_time(task_, i, M)
+    result = int((1 - critical_proportion) * execution_time(task_, i, M)) + suspension_time(task_, i, M)
     max_H_hp = 0
     b_dmh = 0
     for h in range(i):
         worstCaseResponseTime_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
         alpha = math.ceil((result + worstCaseResponseTime_h - max_critSection_[h]) / T[h])
         beta = math.ceil((result + worstCaseResponseTime_h - max_critSection_[h]) / (T_[h]))
-        delta = min(alpha, int(0.1 * M_[i]) * beta)
+        delta = min(alpha, int(critical_proportion * M_[i]) * beta)
         for k in range(M_[h] - 1):
             temp = H_(h, k, R_, task_, zeta_, max_critSection_)
             if temp > max_H_hp:
@@ -441,7 +441,7 @@ def prioritized_blocking_time_req(
     for _l in range(i + 1, n):
         if R_[i] == R_[_l]:
             sum_lpp_blocking += max_critSection_[_l]
-    eta = max(int(0.1 * (M[i] - 1)), 1)
+    eta = max(int(critical_proportion * (M[i] - 1)), 1)
     b_pr = sum_lpp_blocking * (eta + 1)
     return b_pr
 
@@ -473,7 +473,7 @@ def prioritized_blocking_time_job(
     B_pj = 0
     for _l in range(i + 1, n):
         theta = math.ceil((T_[_l] + D_[_l] - execution_time(task_, _l, M_)) / T_[_l])
-        B_pj += theta * int(0.1 * execution_time(task_, _l, M_))
+        B_pj += theta * int(critical_proportion * execution_time(task_, _l, M_))
     # while 1:
     #     if iteration_count > 100000:
     #         print("prioritized blocking job-approach timeout, iteration count > 100000")
@@ -517,12 +517,12 @@ def prioritized_blocking_time_hybrid(
     :param max_critSection_: max critical section
     :return: prioritized blocking time under hybrid approach
     """
-    eta_i = max(int(0.1 * (M[i] - 1)), 1)
+    eta_i = max(int(critical_proportion * (M[i] - 1)), 1)
     b_pm = 0
     for _l in range(i + 1, n):
         if R_[_l] == R_[i]:
             theta = math.ceil((T_[_l] + D_[_l] - execution_time(task_, _l, M_)) / T_[_l])
-            eta_l = max(int(0.1 * (M[_l] - 1)), 1)
+            eta_l = max(int(critical_proportion * (M[_l] - 1)), 1)
             psi = 0
             for k in range(1, eta_l + 1):
                 iteration_count = 0
@@ -588,7 +588,11 @@ def blocking_time(
 
     if blocking_reqDriven == -1 and blocking_jobDriven == -1 and blocking_hybrid == -1:
         return -1
-    result = min(x for x in (blocking_reqDriven, blocking_jobDriven, blocking_hybrid) if x > 0)
+
+    try:
+        result = min(x for x in (blocking_reqDriven, blocking_jobDriven, blocking_hybrid) if x > 0)
+    except ValueError:
+        return -1
     # print("Request-driven: blocking = ", blocking_reqDriven)
     # print("Job-driven: blocking = ", blocking_jobDriven)
     # print("Hybrid: blocking = ", blocking_hybrid)
@@ -658,8 +662,8 @@ def generator(_utilization, _n):
     for i in range(_n):
         for j in range(M[i]):
             _task[i][2 * j] = randint(C_min[i], C_max_[i])
-            if int(0.1 * _task[i][2 * j]) > max_critSection_value[i]:
-                max_critSection_value[i] = int(0.1 * _task[i][2 * j])
+            if int(critical_proportion * _task[i][2 * j]) > max_critSection_value[i]:
+                max_critSection_value[i] = int(critical_proportion * _task[i][2 * j])
         for j in range(M[i] - 1):
             _task[i][2 * j + 1] = randint(S_min[i], S_max[i])
     # set Period & Deadline
@@ -722,14 +726,15 @@ def calc(task_, D_, T_, n_, R_, M_):
     return task_pass
 
 
-count = 10
+count = 100
 max_critical_section_num = 5  # the number of critical section
 n = 5  # the number of task
 zeta = 0  # Number of suspensions in a critical section
-utilization = 0.5
+utilization = 1
 taskpass = 1
 taskpassnum = 0
 batch = 0
+critical_proportion = 0.1
 M = [102 for _ in range(n)]
 M[0] = 102
 M[1] = 21
@@ -752,5 +757,10 @@ while batch < count:
         taskpassnum += 1
     batch += 1
 
-print("tasknum =", count, "\npasstasknum =", taskpassnum)
-print("Passed rate = ", 100 * taskpassnum / count, "%")
+with open("log.txt", "a") as file:
+    print("tasknum =", count, "\npasstasknum =", taskpassnum, file=file)
+    print("Passed rate = ", 100 * taskpassnum / count, "%", file=file)
+
+#
+# print("tasknum =", count, "\npasstasknum =", taskpassnum)
+# print("Passed rate = ", 100 * taskpassnum / count, "%")
