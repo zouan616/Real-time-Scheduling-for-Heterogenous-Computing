@@ -71,16 +71,35 @@ def execution_time(
     return result
 
 
-def WCRT(k, task_, T_, R_, zeta_, M_, max_critSection_):
+def WCRT(
+        k: int,
+        task_: List[List[int]],
+        T_: List[int],
+        D_: List[int],
+        R_: List[int],
+        zeta_: int,
+        M_: List[int],
+        max_critSection_: List[int]):
+    """
+    Worst Case Response Time of task \tau_k
+
+    :param k: task index
+    :param task_: taskset
+    :param T_: period
+    :param D_: deadline
+    :param R_: lock
+    :param zeta_: number of suspension in critical section, default=0
+    :param M_: CPU segment number
+    :param max_critSection_: max critical section length
+    :return: WCRT of task k
+    """
+
     if wcrt[k] != 0:
-        # print("WCRT of task", k, "is recorded, call from WCRt()")
         return wcrt[k]
-    blockTime = blocking_time(k, task_, T_, R_, zeta_, M_, max_critSection_)
-    # print("total blocking time = ", blockTime)
+    blockTime = blocking_time(k, task_, T_, D_, R_, zeta_, M_, max_critSection_)
     if blockTime == -1:
         return -1
     result = execution_time(task_, k, M) + suspension_time(task_, k, M) + blockTime
-    # print("WCRT starting point = ", result)
     if k == 0:
         return result
     else:
@@ -91,12 +110,10 @@ def WCRT(k, task_, T_, R_, zeta_, M_, max_critSection_):
                 return -1
             temp = 0
             for h in range(k):
-                temp += math.ceil(
-                    (result + WCRT(h, task_, T_, R_, zeta_, M_, max_critSection_) - max_critSection_[h]) / (T[h])) * \
-                        max_critSection_[h]
+                worstCaseResponseTime = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
+                temp += math.ceil((result + worstCaseResponseTime - execution_time(task_, h, M_))
+                                  / (T[h])) * execution_time(task_, h, M_)
             if result >= temp:
-                # print("Value of Sum_I = ", temp)
-                # print("Currently, WCRT = ", result)
                 break
             result += 1
             iteration_count += 1
@@ -104,57 +121,8 @@ def WCRT(k, task_, T_, R_, zeta_, M_, max_critSection_):
         return result
 
 
-# def alpha(i, h, task_, t_):
-#     # upper bound on the number of instances of τh released during the execution of a single job of τi
-#     # result = math.ceil(((wc_cpu_excution(i, task_)+WCRT(h, task_, t_, R, zeta)-wc_cpu_excution(h, task_))/t_[h]))
-#     result = math.ceil(((WCRT(i, task_, t_, R, zeta) + WCRT(h, task_, t_, R, zeta)-wc_cpu_excution(h, task_))/t_[h]))
-#     print("Calculating alpha of ", i, h, "result =", result)
-#     return result
-
-
-# def theta(i, l, task_):
-#     # defined as an upper bound on the number of instances of-
-#     # -a lower-priority task τl that may be active during the execution of τi
-#     result = math.ceil((execution_time(i, task_, M) + D[l] - execution_time(l, task_, M))/T[l])
-#     return result
-
-
-# def kth_longest_critical_section(i, k, task_):
-#     # find the kth_longest_critical_section for the task which has lower priority than taski
-#     heap = []
-#     for y in range(k):
-#         heap.append(0)
-#     for tasknum in range(i+1, n):
-#         for j in range(1, M[i] + 1):
-#             heap.append(critical_section_time_part(tasknum, j, task_))
-#     index = []
-#     for y in range(n*(M[i])):
-#         index.append(y)
-#     heap, index = (list(t) for t in zip(*sorted(zip(heap, index))))
-#     return heap[len(heap) - k], index[len(heap) - k]
-
-
-# def direct_blocking_time_lp(i, task_):
-#     if i == (n-1):
-#         return 0
-#     bdr = 0
-#     for k in range(1, (M[i])*n+1):
-#         num = 0
-#         s = 0
-#         kth_longest_cs, index = kth_longest_critical_section(i, k, task_)
-#         for t in range(0, k):
-#             index = t//M[i]
-#             # index = t//2
-#             if R[index] == R[i]:
-#                 s = s + num
-#                 num = max(min(M[i] - s, theta(i, index, task_)), 0)
-#                 'num = max(min(max_critical_section_num - sum,1),0)'
-#         bdr = bdr+num * kth_longest_cs
-#     return bdr
-
-
 def H_(
-        l: int,
+        _l: int,
         k: int,
         R_: List[int],
         task_: List[List[int]],
@@ -164,7 +132,7 @@ def H_(
     WCRT of k-th critical section of task \tau_l. Equation (14)
     Assumption: 10% of CPU execution is critical
 
-    :param l: task index
+    :param _l: task index
     :param k: critical section index
     :param R_: lock
     :param task_: taskset
@@ -173,8 +141,8 @@ def H_(
     :return: WCRT of k-th critical section of task \tau_l
     """
 
-    temp = int(0.1 * execution_time_part(task_, l, k)) + suspension_time_part(task_, l, k)
-    temp += indirect_blocking_time(l, R_, zeta_, max_critSection_)
+    temp = int(0.1 * execution_time_part(task_, _l, k)) + suspension_time_part(task_, _l, k)
+    temp += indirect_blocking_time(_l, R_, zeta_, max_critSection_)
     return temp
 
 
@@ -184,6 +152,7 @@ def direct_blocking_time_req_helper(
         task_: List[List[int]],
         zeta_: int,
         T_: List[int],
+        D_: List[int],
         M_: List[int],
         max_critSection_: List[int]):
     """
@@ -195,6 +164,7 @@ def direct_blocking_time_req_helper(
     :param task_: taskset
     :param zeta_: number of suspension in a critical section, default = 0
     :param T_: period
+    :param D_: deadline
     :param M_: CPU segment number
     :param max_critSection_: max critical section length
     :return: segment-level worst case blocking time
@@ -204,10 +174,10 @@ def direct_blocking_time_req_helper(
     max_H_hp = 0
 
     # WCRT of critical section of all lp tasks
-    for l in range(i, n):
-        if R[l] == R[i]:
-            for k in range(M_[l] - 1):
-                temp = H_(l, k, R_, task_, zeta_, max_critSection_)
+    for _l in range(i + 1, n):
+        if R[_l] == R[i]:
+            for k in range(M_[_l] - 1):
+                temp = H_(_l, k, R_, task_, zeta_, max_critSection_)
                 if temp > max_H_lp:
                     max_H_lp = temp
     leftSum += max_H_lp
@@ -219,7 +189,7 @@ def direct_blocking_time_req_helper(
             return -1
         for h in range(i):
             if R[h] == R[i]:
-                wcrt_h = WCRT(h, task_, T_, R_, zeta_, M_, max_critSection_)
+                wcrt_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
                 beta = math.ceil((leftSum + wcrt_h - execution_time(task_, h, M_)) / (T_[h]))
                 for k in range(M_[h] - 1):
                     temp = H_(h, k, R_, task_, zeta_, max_critSection_)
@@ -238,6 +208,7 @@ def direct_blocking_time_req(
         i: int,
         task_: List[List[int]],
         T_: List[int],
+        D_: List[int],
         R_: List[int],
         zeta_: int,
         M_: List[int],
@@ -248,6 +219,7 @@ def direct_blocking_time_req(
     :param i: task index
     :param task_: taskset
     :param T_: period
+    :param D_: deadline
     :param R_: lock
     :param zeta_: number of suspension in a critical section, default=0
     :param M_: CPU segment number
@@ -260,7 +232,7 @@ def direct_blocking_time_req(
     # result = 0
     # for _ in range(M[i]):
     #     result += direct_blocking_time_req_helper(i, R_, task_, zeta_, T_)
-    seg_blockingTime = direct_blocking_time_req_helper(i, R_, task_, zeta_, T_, M_, max_critSection_)
+    seg_blockingTime = direct_blocking_time_req_helper(i, R_, task_, zeta_, T_, D_, M_, max_critSection_)
     if seg_blockingTime == -1:
         return -1
     result = M_[i] * seg_blockingTime
@@ -271,6 +243,7 @@ def direct_blocking_time_job(
         i: int,
         task_: List[List[int]],
         T_: List[int],
+        D_: List[int],
         R_: List[int],
         zeta_: int,
         max_critSection_: List[int],
@@ -281,6 +254,7 @@ def direct_blocking_time_job(
     :param i: task index
     :param task_: taskset
     :param T_: period
+    :param D_: deadline
     :param R_: lock
     :param zeta_: number of suspension in a critical section, default=0
     :param max_critSection_: max critical section
@@ -288,44 +262,50 @@ def direct_blocking_time_job(
     :return: direct block time
     """
 
-    leftSum = 0
-    temp = 0
     max_H_lp = 0
-    max_H_hp = 0
-    eta = max(int(0.1 * (M[i] - 1)), 1)
-    for l in range(i, n):
-        if R[l] == R[i]:
-            for k in range(M_[l] - 1):
-                temp = H_(l, k, R_, task_, zeta_, max_critSection_)
+    eta_i = max(int(0.1 * (M[i] - 1)), 1)
+    for _l in range(i + 1, n):
+        if R[_l] == R[i]:
+            for k in range(M_[_l] - 1):
+                temp = H_(_l, k, R_, task_, zeta_, max_critSection_)
                 if temp > max_H_lp:
                     max_H_lp = temp
-    leftSum += max_H_lp * eta
-    rightSum = max_H_lp * eta
-    iteration_count = 0
-    while 1:
-        if iteration_count > 100000:
-            print("direct blocking job-approach timeout, iteration count > 100000")
-            return -1
-        for h in range(i):
-            wcrt_h = WCRT(h, task_, T_, R_, zeta_, M_, max_critSection_)
-            alpha = math.ceil((leftSum + wcrt_h - execution_time(task_, h, M_)) / T[h])
-            for k in range(M_[h] - 1):
-                temp = H_(h, k, R_, task_, zeta_, max_critSection_)
-                if temp > max_H_hp:
-                    max_H_hp = temp
-            rightSum += alpha * temp
-        if leftSum >= rightSum:
-            break
-        else:
-            leftSum += 10
-        iteration_count += 1
-    return leftSum
+    b_dj = max_H_lp * eta_i
+    for h in range(i):
+        max_H_hp = 0
+        worstCastResponseTime_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
+        alpha = math.ceil((T[i] - worstCastResponseTime_h - execution_time(task_, h, M_)) / T[h])
+        for k in range(M_[h] - 1):
+            temp = H_(h, k, R_, task_, zeta_, max_critSection_)
+            if temp > max_H_hp:
+                max_H_hp = temp
+        b_dj += alpha * max_H_hp
+    # iteration_count = 0
+    # while 1:
+    #     if iteration_count > 100000:
+    #         print("direct blocking job-approach timeout, iteration count > 100000")
+    #         return -1
+    #     for h in range(i):
+    #         worstCastResponseTime_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
+    #         alpha = math.ceil((leftSum + worstCastResponseTime_h - execution_time(task_, h, M_)) / T[h])
+    #         for k in range(M_[h] - 1):
+    #             temp = H_(h, k, R_, task_, zeta_, max_critSection_)
+    #             if temp > max_H_hp:
+    #                 max_H_hp = temp
+    #         rightSum += alpha * temp
+    #     if leftSum >= rightSum:
+    #         break
+    #     else:
+    #         leftSum += 10
+    #     iteration_count += 1
+    return b_dj
 
 
 def direct_blocking_time_hybrid_hp(
         i: int,
         task_: List[List[int]],
         T_: List[int],
+        D_: List[int],
         R_: List[int],
         zeta_: int,
         max_critSection_: List[int],
@@ -336,6 +316,7 @@ def direct_blocking_time_hybrid_hp(
     :param i: task index
     :param task_: taskset
     :param T_: period
+    :param D_: deadline
     :param R_: lock
     :param zeta_: number of suspension in a critical section, default=0
     :param max_critSection_: max critical section length
@@ -346,8 +327,9 @@ def direct_blocking_time_hybrid_hp(
     max_H_hp = 0
     b_dmh = 0
     for h in range(i):
-        alpha = math.ceil((result + WCRT(h, task_, T_, R_, zeta_, M_, max_critSection_) - max_critSection_[h]) / T[h])
-        beta = math.ceil((result + WCRT(h, task_, T_, R_, zeta_, M_, max_critSection_) - max_critSection_[h]) / (T_[h]))
+        worstCaseResponseTime_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
+        alpha = math.ceil((result + worstCaseResponseTime_h - max_critSection_[h]) / T[h])
+        beta = math.ceil((result + worstCaseResponseTime_h - max_critSection_[h]) / (T_[h]))
         delta = min(alpha, int(0.1 * M_[i]) * beta)
         for k in range(M_[h] - 1):
             temp = H_(h, k, R_, task_, zeta_, max_critSection_)
@@ -357,46 +339,65 @@ def direct_blocking_time_hybrid_hp(
     return b_dmh
 
 
-def direct_blocking_time_hybrid_lp(i, task_, T_, R_, zeta_, max_critSection_, M_):
+def direct_blocking_time_hybrid_lp(
+        i: int,
+        task_: List[List[int]],
+        R_: List[int],
+        zeta_: int,
+        max_critSection_: List[int],
+        M_: List[int]):
     """
     Hybrid Approach -- lp
 
     :param i: task index
     :param task_: taskset
-    :param T_: period
     :param R_: lock
-    :param zeta_: const
-    :return: direct block time
+    :param zeta_: number of suspension in a critical section, default=0
+    :param max_critSection_: max critical section length
+    :param M_: CPU segment number
+    :return: direct block time of lower priority tasks
     """
     b_dml = 0
-    Q_ij = 0
     L_ijk = 0
+
     for j in range(n):
         if R[j] == R[i]:
-            for l in range(i, n):
-                if R[l] == R[j]:
-                    for k in range(M_[l] - 1):
-                        temp = H_(l, k, R_, task_, zeta_, max_critSection_)
-                        if temp > Q_ij:
-                            Q_ij = temp
-                            L_ijk = max_critSection_[l]
-            b_dml += Q_ij * L_ijk
+            Q_ij = 0
+            for _l in range(i + 1, n):
+                if R[_l] == R[j]:
+                    Q_ij += 1
+                    for k in range(M_[_l] - 1):
+                        temp = H_(_l, k, R_, task_, zeta_, max_critSection_)
+                        if temp > L_ijk:
+                            L_ijk = temp
+                    b_dml += L_ijk
     return b_dml
 
 
-def direct_blocking_time_hybrid(i, task_, T_, R_, zeta_, max_critSection_, M_):
+def direct_blocking_time_hybrid(
+        i: int,
+        task_: List[List[int]],
+        T_: List[int],
+        D_: List[int],
+        R_: List[int],
+        zeta_: int,
+        max_critSection_: List[int],
+        M_: List[int]):
     """
     Hybrid Approach
 
     :param i: task index
     :param task_: taskset
     :param T_: period
+    :param D_: deadline
     :param R_: lock
-    :param zeta_: const
+    :param zeta_: number of suspension in a critical section, default=0
+    :param max_critSection_: max critical section length
+    :param M_: CPU segment number
     :return: direct block time
     """
-    result = direct_blocking_time_hybrid_lp(i, task_, T_, R_, zeta_, max_critSection_, M_) + \
-             direct_blocking_time_hybrid_hp(i, task_, T_, R_, zeta_, max_critSection_, M_)
+    result = direct_blocking_time_hybrid_lp(i, task_, R_, zeta_, max_critSection_, M_) + \
+        direct_blocking_time_hybrid_hp(i, task_, T_, D_, R_, zeta_, max_critSection_, M_)
     return result
 
 
@@ -423,7 +424,10 @@ def indirect_blocking_time(
     return b_ir
 
 
-def prioritized_blocking_time_req(i, R_, max_critSection_):
+def prioritized_blocking_time_req(
+        i: int,
+        R_: List[int],
+        max_critSection_: List[int]):
     """
     Request-Driven Approach
 
@@ -432,98 +436,238 @@ def prioritized_blocking_time_req(i, R_, max_critSection_):
     :param max_critSection_: max critical section length
     :return: request-driven prioritized blocking time
     """
+
     sum_lpp_blocking = 0
-    for l in range(i, n):
-        if R_[i] == R_[l]:
-            sum_lpp_blocking += max_critSection_[l]
-    b_pr = sum_lpp_blocking * (M[i] + 1)
+    for _l in range(i + 1, n):
+        if R_[i] == R_[_l]:
+            sum_lpp_blocking += max_critSection_[_l]
+    eta = max(int(0.1 * (M[i] - 1)), 1)
+    b_pr = sum_lpp_blocking * (eta + 1)
     return b_pr
 
 
-# def prioritized_blocking_time_job(i, R_, max_critSection_):
+def prioritized_blocking_time_job(
+        i: int,
+        R_: List[int],
+        zeta_: int,
+        task_: List[List[int]],
+        T_: List[int],
+        D_: List[int],
+        M_: List[int],
+        max_critSection_: List[int]):
+    """
+    prioritized blocking time -- job-driven approach
+
+    :param i: task index
+    :param R_: lock
+    :param zeta_: number of suspension in a critical section, default=0
+    :param task_: taskset
+    :param T_: period
+    :param D_: deadline
+    :param M_: CPU segment number
+    :param max_critSection_: max critical section length
+    :return: prioritized blocking time
+    """
+    # iteration_count = 0
+    # leftSum = execution_time(task_, i, M_) + suspension_time(task_, i, M_)
+    B_pj = 0
+    for _l in range(i + 1, n):
+        theta = math.ceil((T_[_l] + D_[_l] - execution_time(task_, _l, M_)) / T_[_l])
+        B_pj += theta * int(0.1 * execution_time(task_, _l, M_))
+    # while 1:
+    #     if iteration_count > 100000:
+    #         print("prioritized blocking job-approach timeout, iteration count > 100000")
+    #     B_pj = 0
+    #     for _l in range(i, n):
+    #         if R_[_l] == R_[i]:
+    #             theta = math.ceil((T_[_l] + D_[_l] - execution_time(task_, _l, M_)) / T_[_l])
+    #             B_pj += theta * int(0.1 * execution_time(task_, _l, M_))
+    #     rightSum = leftSum + B_pj
+    #     instance = 0
+    #     for h in range(i):
+    #         worstCastResponseTime_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
+    #         alpha = math.ceil((leftSum + worstCastResponseTime_h - execution_time(task_, h, M_))/T_[h])
+    #         instance += alpha * execution_time(task, h, M_)
+    #     rightSum += instance
+    #     if leftSum >= rightSum:
+    #         break
+    #     else:
+    #         leftSum += 10
+    #     iteration_count += 1
+    return B_pj
 
 
-def blocking_time(i, task_, T_, R_, zeta_, M_, max_critSection_):
-    direct_B_req = direct_blocking_time_req(i, task_, T_, R_, zeta_, M_, max_critSection_)
-    direct_B_job = direct_blocking_time_job(i, task_, T_, R_, zeta_, max_critSection_, M_)
-    direct_B_hybrid = direct_blocking_time_hybrid(i, task_, T_, R_, zeta_, max_critSection_, M_)
-    print("direct_B_req = ", direct_B_req)
-    print("direct_B_job = ", direct_B_job)
-    print("direct_B_hybrid = ", direct_B_hybrid)
-    if direct_B_req == -1 and direct_B_job == -1 and direct_B_hybrid == -1:
+def prioritized_blocking_time_hybrid(
+        i: int,
+        R_: List[int],
+        task_: List[List[int]],
+        T_: List[int],
+        D_: List[int],
+        M_: List[int],
+        max_critSection_: List[int]):
+    """
+    Prioritized blocking time -- hybrid approach
+
+    :param i: task index
+    :param R_: lock
+    :param task_: taskset
+    :param T_: period
+    :param D_: deadline
+    :param M_: CPU segment number
+    :param max_critSection_: max critical section
+    :return: prioritized blocking time under hybrid approach
+    """
+    eta_i = max(int(0.1 * (M[i] - 1)), 1)
+    b_pm = 0
+    for _l in range(i + 1, n):
+        if R_[_l] == R_[i]:
+            theta = math.ceil((T_[_l] + D_[_l] - execution_time(task_, _l, M_)) / T_[_l])
+            eta_l = max(int(0.1 * (M[_l] - 1)), 1)
+            psi = 0
+            for k in range(1, eta_l + 1):
+                iteration_count = 0
+                while 1:
+                    if iteration_count > 100000:
+                        print("prioritized hybrid-approach blocking timeout, iteration count > 100000")
+                        return -1
+                    leftSum = eta_i + 1
+                    for t in range(1, k):
+                        leftSum -= psi
+                    if psi >= min(leftSum, theta):
+                        break
+                    else:
+                        psi += 1
+                    iteration_count += 1
+                b_pm += psi * max_critSection_[_l]
+    return b_pm
+
+
+def blocking_time(
+        i: int,
+        task_: List[List[int]],
+        T_: List[int],
+        D_: List[int],
+        R_: List[int],
+        zeta_: int,
+        M_: List[int],
+        max_critSection_: List[int]):
+    """
+    Total blocking time
+
+    :param i: task index
+    :param task_: taskset
+    :param D_: deadline
+    :param T_: period
+    :param R_: lock
+    :param zeta_: number of suspension in a critical section, default=0
+    :param M_: CPU segment number
+    :param max_critSection_: max critical section length
+    :return: minimum total blocking time
+    """
+
+    direct_B_req = direct_blocking_time_req(i, task_, T_, D_, R_, zeta_, M_, max_critSection_)
+    prioritized_B_req = prioritized_blocking_time_req(i, R_, max_critSection_)
+    if direct_B_req == -1 or prioritized_B_req == -1:
+        blocking_reqDriven = -1
+    else:
+        blocking_reqDriven = direct_B_req + prioritized_B_req
+
+    direct_B_job = direct_blocking_time_job(i, task_, T_, D_, R_, zeta_, max_critSection_, M_)
+    prioritized_B_job = prioritized_blocking_time_job(i, R_, zeta_, task_, T_, D_, M_, max_critSection_)
+    if direct_B_job == -1 or prioritized_B_job == -1:
+        blocking_jobDriven = -1
+    else:
+        blocking_jobDriven = direct_B_job + prioritized_B_job
+
+    direct_B_hybrid = direct_blocking_time_hybrid(i, task_, T_, D_, R_, zeta_, max_critSection_, M_)
+    prioritized_B_hybrid = prioritized_blocking_time_hybrid(i, R_, task_, T_, D_, M_, max_critSection_)
+    if direct_B_hybrid == -1 or prioritized_B_hybrid == -1:
+        blocking_hybrid = -1
+    else:
+        blocking_hybrid = direct_B_hybrid + prioritized_B_hybrid
+
+    if blocking_reqDriven == -1 and blocking_jobDriven == -1 and blocking_hybrid == -1:
         return -1
-    direct_B = min(x for x in (direct_B_req, direct_B_job, direct_B_hybrid) if x > 0)
-    prioritized_B = prioritized_blocking_time_req(i, R_, max_critSection_)
-    result = direct_B + prioritized_B
+    result = min(x for x in (blocking_reqDriven, blocking_jobDriven, blocking_hybrid) if x > 0)
+    # print("Request-driven: blocking = ", blocking_reqDriven)
+    # print("Job-driven: blocking = ", blocking_jobDriven)
+    # print("Hybrid: blocking = ", blocking_hybrid)
     return result
 
 
-def generator(utilization, n):
-    task = [[0 for _ in range(203)] for _ in range(n)]
-    T = [0 for _ in range(n)]
-    D = [0 for _ in range(n)]
-    U = [0 for _ in range(n)]
-    R = [0 for _ in range(n)]
+def generator(_utilization, _n):
+    """
+    Task generation
+
+    :param _utilization: (double) net utilization
+    :param _n: number of tasks in taskset
+    :return: generated taskset & accompanying info
+    """
+    _task = [[0 for _ in range(203)] for _ in range(_n)]
+    _T = [0 for _ in range(_n)]
+    _D = [0 for _ in range(_n)]
+    U = [0 for _ in range(_n)]
+    _R = [0 for _ in range(_n)]
 
     # total CPU execution
-    C_max_ = [0 for _ in range(n)]
+    C_max_ = [0 for _ in range(_n)]
     C_max_[0] = 4
     C_max_[1] = 15
     C_max_[2] = 238
     C_max_[3] = 350
     C_max_[4] = 25
-    C_min = [0 for _ in range(n)]
+    C_min = [0 for _ in range(_n)]
     C_min[0] = 2
     C_min[1] = 13
     C_min[2] = 130
     C_min[3] = 150
     C_min[4] = 15
-    S_max = [0 for _ in range(n)]
+    S_max = [0 for _ in range(_n)]
     S_max[0] = 25
     S_max[1] = 8
     S_max[2] = 1
     S_max[3] = 483
     S_max[4] = 10
-    S_min = [0 for _ in range(n)]
+    S_min = [0 for _ in range(_n)]
     S_min[0] = 20
     S_min[1] = 5
     S_min[2] = 1
     S_min[3] = 482
     S_min[4] = 8
-    max_critSection_value = [0 for _ in range(n)]
+    max_critSection_value = [0 for _ in range(_n)]
 
     # set utilization rate
-    for Ri in range(n):
-        R[Ri] = Ri % 2
+    for Ri in range(_n):
+        _R[Ri] = Ri % 2
     while 1:
         U_sum = 0
         flag_valid = 1
-        for ui in range(n):
+        for ui in range(_n):
             U[ui] = randint(1, 10)
             U_sum += U[ui]
-        resolution = U_sum / utilization
-        for ui in range(n):
+        resolution = U_sum / _utilization
+        for ui in range(_n):
             U[ui] = U[ui] / resolution
             if U[ui] > 1:
                 flag_valid = 0
         if flag_valid == 1:
             break
-    for ui in range(n):
+    for ui in range(_n):
         print("Utilization for task[", ui, "] is", U[ui])
     # set computation segments
-    for i in range(n):
+    for i in range(_n):
         for j in range(M[i]):
-            task[i][2 * j] = randint(C_min[i], C_max_[i])
-            if int(0.1 * task[i][2 * j]) > max_critSection_value[i]:
-                max_critSection_value[i] = int(0.1 * task[i][2 * j])
+            _task[i][2 * j] = randint(C_min[i], C_max_[i])
+            if int(0.1 * _task[i][2 * j]) > max_critSection_value[i]:
+                max_critSection_value[i] = int(0.1 * _task[i][2 * j])
         for j in range(M[i] - 1):
-            task[i][2 * j + 1] = randint(S_min[i], S_max[i])
+            _task[i][2 * j + 1] = randint(S_min[i], S_max[i])
     # set Period & Deadline
-    for i in range(n):
-        temp = execution_time(task, i, M) + suspension_time(task, i, M)
-        T[i] = int(temp / U[i])
-        D[i] = T[i]
-    return task, D, R, max_critSection_value
+    for i in range(_n):
+        temp = execution_time(_task, i, M) + suspension_time(_task, i, M)
+        _T[i] = int(temp / U[i])
+        _D[i] = _T[i]
+    return _task, _D, _R, max_critSection_value
 
 
 def calc(task_, D_, T_, n_, R_, M_):
@@ -537,15 +681,14 @@ def calc(task_, D_, T_, n_, R_, M_):
 
     for idx, (permutation, deadline_permutation, period_permutation, R_permutation, M_permutation,
               maxCritSection_permutation) in enumerate(
-            zip(row_permutations, deadline_permutations, period_permutations, R_permutations, M_permutations,
-                maxCritSection_permutations)):
+        zip(row_permutations, deadline_permutations, period_permutations, R_permutations, M_permutations,
+            maxCritSection_permutations)):
         NEW_task = list(permutation)
-        # 输出新矩阵
+        # print taskset under new priority
         print("=================================================")
         print(f"Permutation {idx + 1}:")
         for row in NEW_task:
             print(row)
-        # 输出其他矩阵的排列
         print("Deadline Permutation:", deadline_permutation)
         print("Period Permutation:", period_permutation)
         print("Lock Permutation:", R_permutation)
@@ -556,10 +699,10 @@ def calc(task_, D_, T_, n_, R_, M_):
             wcrt[i] = 0
             directblocktime[i] = 0
         for i in range(n_):
-            WCRT_res = WCRT(i, NEW_task, deadline_permutation, R_permutation, zeta, M_permutation,
+            WCRT_res = WCRT(i, NEW_task, period_permutation, deadline_permutation, R_permutation, zeta, M_permutation,
                             maxCritSection_permutation)
             if WCRT_res == -1:
-                print("task ", i, "timeout")
+                print("task", i, "timeout")
                 task_pass = 0
                 break
             elif WCRT_res > deadline_permutation[i]:
@@ -568,7 +711,7 @@ def calc(task_, D_, T_, n_, R_, M_):
                 task_pass = 0
                 break
             else:
-                print("task ", i, "passed")
+                print("task", i, "passed")
                 task_pass = 1
         if task_pass:
             print("Final result:pass")
@@ -577,50 +720,13 @@ def calc(task_, D_, T_, n_, R_, M_):
     if task_pass == 0:
         print("Final result:Not pass")
     return task_pass
-    # taskcombine = []
-    # iter = itertools.permutations(task, n)
-    # taskcombine.append(list(iter))
-    # Dcombine = []
-    # iter = itertools.permutations(D, n)
-    # Dcombine.append(list(iter))
-    # Rcombine = []
-    # iter = itertools.permutations(R, n)
-    # Rcombine.append(list(iter))
-    # task_pass = 0
-    # for j_ in range(math.factorial(n)):
-    #     for i in range(n):
-    #         wcrt[i] = 0
-    #         directblocktime[i] = 0
-    #     task_ = taskcombine[0][j_]
-    #     D_ = Dcombine[0][j_]
-    #     R_ = Rcombine[0][j_]
-    #     print("task:", task_)
-    #     for k in range(n):
-    #         print("Deadline of task", k, ":", D_[k])
-    #     for i in range(n):
-    #         WCRT_res = WCRT(i, task_, D_, R_, zeta)
-    #         if WCRT_res >= D_[i]:
-    #             print("WCRT = ", WCRT_res)
-    #             print("Deadline = ", D_[i])
-    #             task_pass = 0
-    #             break
-    #         else:
-    #             task_pass = 1
-    #     if task_pass:
-    #         print("Final result:pass")
-    #         break
-    #     # else:
-    #         # print("Not pass, change the combination")
-    # if task_pass == 0:
-    #     print("Final result:Not pass")
-    # return task_pass
 
 
 count = 10
 max_critical_section_num = 5  # the number of critical section
 n = 5  # the number of task
 zeta = 0  # Number of suspensions in a critical section
-utilization = 0.2
+utilization = 0.5
 taskpass = 1
 taskpassnum = 0
 batch = 0
@@ -630,8 +736,7 @@ M[1] = 21
 M[2] = 4
 M[3] = 2
 M[4] = 10
-# max WCET of critical section of task i
-max_critSection = [0 for _ in range(n)]
+max_critSection = [0 for _ in range(n)]  # max WCET of critical section of task i
 
 while batch < count:
     directblocktime = []
