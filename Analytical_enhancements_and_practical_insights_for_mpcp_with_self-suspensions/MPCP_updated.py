@@ -330,7 +330,8 @@ def direct_blocking_time_hybrid_hp(
         worstCaseResponseTime_h = WCRT(h, task_, T_, D_, R_, zeta_, M_, max_critSection_)
         alpha = math.ceil((result + worstCaseResponseTime_h - max_critSection_[h]) / T[h])
         beta = math.ceil((result + worstCaseResponseTime_h - max_critSection_[h]) / (T_[h]))
-        delta = min(alpha, int(critical_proportion * M_[i]) * beta)
+        eta_i = max(int(critical_proportion * (M[i] - 1)), 1)
+        delta = min(alpha, eta_i * beta)
         for k in range(M_[h] - 1):
             temp = H_(h, k, R_, task_, zeta_, max_critSection_)
             if temp > max_H_hp:
